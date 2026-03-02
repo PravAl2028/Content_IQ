@@ -22,7 +22,6 @@ const QUICK_LINKS = [
   { label: 'Distribution', href: '/dashboard/distribution', icon: ShareIcon, color: '#10b981' },
   { label: 'Privacy Filter', href: '/dashboard/privacy-filter', icon: ShieldCheckIcon, color: '#f59e0b' },
   { label: 'Voice Tracker', href: '/dashboard/voice-tracker', icon: MicrophoneIcon, color: '#f43f5e' },
-  { label: 'Multilingual Dubbing', href: '/dashboard/multilingual-dubbing', icon: GlobeAltIcon, color: '#a855f7' },
   { label: 'Thumbnail Analyzer', href: '/dashboard/thumbnail-analyzer', icon: PhotoIcon, color: '#06b6d4' },
   { label: 'BGM Suggestor', href: '/dashboard/bgm-suggestor', icon: MusicalNoteIcon, color: '#ec4899' },
 ]

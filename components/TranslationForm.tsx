@@ -25,6 +25,8 @@ const LANGUAGES = [
 
 export default function TranslationForm() {
     const [file, setFile] = useState<File | null>(null);
+    const [inputMode, setInputMode] = useState<"file" | "text">("file");
+    const [inputText, setInputText] = useState("");
     const [sourceLang, setSourceLang] = useState("en");
     const [targetLang, setTargetLang] = useState("ja");
     const [voiceGender, setVoiceGender] = useState("any");
@@ -47,19 +49,28 @@ export default function TranslationForm() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setFile(e.target.files[0]);
+            setInputMode("file");
             setResult(null);
             setError("");
         }
     };
 
     const handleTranslate = async () => {
-        if (!file) return;
+        if (inputMode === "file" && !file) return;
+        if (inputMode === "text" && !inputText.trim()) return;
+
         setIsUploading(true);
         setError("");
         setResult(null);
 
         const formData = new FormData();
-        formData.append("file", file);
+
+        if (inputMode === "file" && file) {
+            formData.append("file", file);
+        } else if (inputMode === "text") {
+            formData.append("inputText", inputText);
+        }
+
         formData.append("sourceLanguage", sourceLang);
         formData.append("targetLanguage", targetLang);
         formData.append("voiceGender", voiceGender);
@@ -180,45 +191,71 @@ export default function TranslationForm() {
                             </div>
                         </div>
 
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium mb-2 text-zinc-300">Upload File (Audio or Text)</label>
-                            <div
-                                onClick={() => fileInputRef.current?.click()}
-                                className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-8 h-[200px] text-center cursor-pointer transition-all ${file ? 'border-purple-500/50 bg-purple-500/5' : 'border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30'}`}
-                            >
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    className="hidden"
-                                    accept=".txt,audio/*,video/*"
-                                    onChange={handleFileChange}
-                                />
-
-                                {file ? (
-                                    <div className="flex flex-col items-center gap-3">
-                                        {file.type.startsWith('audio') ? <FileAudio className="w-10 h-10 text-purple-400" /> : <FileText className="w-10 h-10 text-blue-400" />}
-                                        <div className="space-y-1">
-                                            <div className="text-sm font-medium text-zinc-200 truncate max-w-[200px]">{file.name}</div>
-                                            <div className="text-xs text-zinc-400">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center gap-4">
-                                        <div className="w-12 h-12 rounded-full bg-zinc-800/50 flex items-center justify-center">
-                                            <UploadCloud className="w-6 h-6 text-zinc-400" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-zinc-300">Click or drag file to upload</p>
-                                            <p className="text-xs text-zinc-500 mt-1">Supports .mp3, .wav, .txt</p>
-                                        </div>
-                                    </div>
-                                )}
+                        <div className="flex-1 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <label className="block text-sm font-medium text-zinc-300">Input Content</label>
+                                <div className="flex bg-zinc-900/80 rounded-lg p-1 border border-zinc-800">
+                                    <button
+                                        onClick={() => setInputMode("file")}
+                                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${inputMode === "file" ? "bg-purple-500/20 text-purple-300" : "text-zinc-500 hover:text-zinc-300"}`}
+                                    >
+                                        Upload File
+                                    </button>
+                                    <button
+                                        onClick={() => setInputMode("text")}
+                                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${inputMode === "text" ? "bg-purple-500/20 text-purple-300" : "text-zinc-500 hover:text-zinc-300"}`}
+                                    >
+                                        Paste Text
+                                    </button>
+                                </div>
                             </div>
+
+                            {inputMode === "file" ? (
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-8 h-[200px] text-center cursor-pointer transition-all ${file ? 'border-purple-500/50 bg-purple-500/5' : 'border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30'}`}
+                                >
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        accept=".txt,audio/*,video/*"
+                                        onChange={handleFileChange}
+                                    />
+
+                                    {file ? (
+                                        <div className="flex flex-col items-center gap-3">
+                                            {file.type.startsWith('audio') ? <FileAudio className="w-10 h-10 text-purple-400" /> : <FileText className="w-10 h-10 text-blue-400" />}
+                                            <div className="space-y-1">
+                                                <div className="text-sm font-medium text-zinc-200 truncate max-w-[200px]">{file.name}</div>
+                                                <div className="text-xs text-zinc-400">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className="w-12 h-12 rounded-full bg-zinc-800/50 flex items-center justify-center">
+                                                <UploadCloud className="w-6 h-6 text-zinc-400" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-zinc-300">Click or drag file to upload</p>
+                                                <p className="text-xs text-zinc-500 mt-1">Supports .mp3, .wav, .txt</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <textarea
+                                    className="w-full h-[200px] bg-zinc-900/50 border border-zinc-700/50 focus:border-purple-500/50 rounded-xl p-4 text-sm text-zinc-200 outline-none resize-none transition-colors placeholder:text-zinc-600"
+                                    placeholder="Type or paste the text you want to translate and convert to speech..."
+                                    value={inputText}
+                                    onChange={(e) => setInputText(e.target.value)}
+                                />
+                            )}
                         </div>
 
                         <button
                             onClick={handleTranslate}
-                            disabled={!file || isUploading}
+                            disabled={(inputMode === "file" && !file) || (inputMode === "text" && !inputText.trim()) || isUploading}
                             className="w-full glow-btn py-3 rounded-xl font-semibold text-white/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95"
                         >
                             {isUploading ? (

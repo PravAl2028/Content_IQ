@@ -29,44 +29,53 @@ export const maxDuration = 60; // Allow enough time for transcribe jobs
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
-    const file = formData.get("file") as File;
+    const file = formData.get("file") as File | null;
+    const inputText = formData.get("inputText") as string | null;
     const targetLanguage = formData.get("targetLanguage") as string; // e.g., 'es', 'it', 'fr'
     const sourceLanguage = (formData.get("sourceLanguage") as string) || "en";
     const voiceGender = (formData.get("voiceGender") as string) || "any";
     const voiceAge = (formData.get("voiceAge") as string) || "any";
     const voiceTone = (formData.get("voiceTone") as string) || "any";
 
-    if (!file || !targetLanguage) {
-      return NextResponse.json({ error: "Missing file or targetLanguage" }, { status: 400 });
-    }
-
-    const isAudio = file.type.startsWith("audio/") || file.type.startsWith("video/");
-    const isText = file.type === "text/plain";
-
-    if (!isAudio && !isText) {
-      return NextResponse.json({ error: "Unsupported file type. Please upload audio or .txt file." }, { status: 400 });
+    if ((!file && !inputText) || !targetLanguage) {
+      return NextResponse.json({ error: "Missing file/text or targetLanguage" }, { status: 400 });
     }
 
     let sourceText = "";
+    let isAudio = false;
+    let isText = false;
 
-    // 1. Process Text vs Audio
-    if (isText) {
-      const textBytes = await file.arrayBuffer();
-      sourceText = new TextDecoder().decode(textBytes);
-      if (!sourceText.trim()) throw new Error("Text file is empty");
-    } else {
+    if (inputText) {
+      isText = true;
+      sourceText = inputText;
+    } else if (file) {
+      isAudio = file.type.startsWith("audio/") || file.type.startsWith("video/");
+      isText = file.type === "text/plain";
+
+      if (!isAudio && !isText) {
+        return NextResponse.json({ error: "Unsupported file type. Please upload audio or .txt file." }, { status: 400 });
+      }
+
+      // 1. Process Text vs Audio
+      if (isText) {
+        const textBytes = await file.arrayBuffer();
+        sourceText = new TextDecoder().decode(textBytes);
+        if (!sourceText.trim()) throw new Error("Text file is empty");
+      }
+    } else if (file) {
       // Audio processing
       // a. Upload S3
-      const bytes = await file.arrayBuffer();
+      const validFile = file as File;
+      const bytes = await validFile.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const key = `audio-uploads/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+      const key = `audio-uploads/${Date.now()}-${validFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
       const bucketName = process.env.S3_BUCKET_NAME!;
 
       await s3.send(new PutObjectCommand({
         Bucket: bucketName,
         Key: key,
         Body: buffer,
-        ContentType: file.type,
+        ContentType: validFile.type,
       }));
 
       // b. Transcribe
@@ -113,15 +122,6 @@ export async function POST(req: Request) {
       Text: sourceText,
     }));
     const translatedText = translatedResult.TranslatedText || "";
-
-    if (isText) {
-      return NextResponse.json({
-        success: true,
-        originalText: sourceText,
-        translatedText,
-        type: "text"
-      });
-    }
 
     // 3. Audio: Text-to-Speech (ElevenLabs)
     // The `eleven_multilingual_v2` model automatically detects and speaks the correct language!

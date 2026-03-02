@@ -9,8 +9,8 @@ export default function TranslatorPage() {
                     <GlobeAltIcon style={{ width: 22, height: 22, color: '#a855f7' }} />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-white">Universal Translator</h1>
-                    <p className="text-sm" style={{ color: '#A1A1AA' }}>Translate Audio and Text files across 50+ languages instantly</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-white">Multilingual Dubbing</h1>
+                    <p className="text-sm" style={{ color: '#A1A1AA' }}>Translate Audio and Text files across Multiple Languages</p>
                 </div>
             </div>
 

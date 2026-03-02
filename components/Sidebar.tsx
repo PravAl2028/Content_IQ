@@ -23,8 +23,7 @@ const NAV_ITEMS = [
   { label: 'Distribution', href: '/dashboard/distribution', icon: ShareIcon },
   { label: 'Privacy Filter', href: '/dashboard/privacy-filter', icon: ShieldCheckIcon },
   { label: 'Voice Tracker', href: '/dashboard/voice-tracker', icon: MicrophoneIcon },
-  { label: 'Multilingual Dubbing', href: '/dashboard/multilingual-dubbing', icon: GlobeAltIcon },
-  { label: 'Universal Translator', href: '/dashboard/translator', icon: LanguageIcon },
+  { label: 'Multilingual Dubbing', href: '/dashboard/translator', icon: LanguageIcon },
   { label: 'Thumbnail Analyzer', href: '/dashboard/thumbnail-analyzer', icon: PhotoIcon },
   { label: 'BGM Suggestor', href: '/dashboard/bgm-suggestor', icon: MusicalNoteIcon },
 ]
