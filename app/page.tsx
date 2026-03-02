@@ -13,6 +13,7 @@ import {
 import { NavBar } from '@/components/ui/tubelight-navbar'
 import HowItWorksTimeline from "@/components/sections/how-it-works-timeline";
 import ScrollFeatureCards from "@/components/sections/scroll-feature-cards";
+import TechStackLayered from "@/components/sections/tech-stack-layered";
 
 // ─── Grid Background ───────────────────────────────────────────────────────────
 function GridBackground() {
@@ -135,63 +136,7 @@ function HeroSection() {
 
 
 
-const TECH_STACK = [
-  { name: 'AWS Lambda', sub: 'Serverless Compute', emoji: '⚡', glow: '#f59e0b' },
-  { name: 'Amazon S3', sub: 'Object Storage', emoji: '🪣', glow: '#00d4ff' },
-  { name: 'Python 3.11', sub: 'AI & Backend', emoji: '🐍', glow: '#10b981' },
-  { name: 'OpenCV', sub: 'Computer Vision', emoji: '👁️', glow: '#a855f7' },
-  { name: 'TensorFlow', sub: 'ML Models', emoji: '🧠', glow: '#f43f5e' },
-  { name: 'FFmpeg', sub: 'Video Processing', emoji: '🎬', glow: '#06b6d4' },
-  { name: 'Redis', sub: 'Caching Layer', emoji: '🔴', glow: '#ef4444' },
-  { name: 'FastAPI', sub: 'REST Backend', emoji: '🚀', glow: '#6366f1' },
-  { name: 'React', sub: 'Frontend UI', emoji: '⚛️', glow: '#00d4ff' },
-  { name: 'AWS Rekognition', sub: 'Face Detection', emoji: '🔍', glow: '#f59e0b' },
-  { name: 'Docker', sub: 'Containerization', emoji: '🐳', glow: '#00a8e8' },
-  { name: 'Whisper AI', sub: 'Transcription', emoji: '🎙️', glow: '#a855f7' },
-]
 
-function TechStackSection() {
-  return (
-    <section id="tech-stack" style={{ padding: '120px 24px', position: 'relative', zIndex: 1 }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} style={{ textAlign: 'center', marginBottom: 80 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 100, padding: '8px 20px', marginBottom: 24 }}>
-            <Network size={14} color="#10b981" />
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#10b981', letterSpacing: '0.5px' }}>TECHNOLOGY</span>
-          </div>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 800, letterSpacing: '-1px', marginBottom: 16 }}>
-            Built on a <span className="gradient-text">world-class</span> stack
-          </h2>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16, maxWidth: 500, margin: '0 auto', lineHeight: 1.7 }}>
-            Production-grade AWS infrastructure married with cutting-edge AI — hover the floating tech icons to explore.
-          </p>
-        </motion.div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'center' }}>
-          {TECH_STACK.map((tech, i) => {
-            const amplitude = 10 + Math.random() * 10
-            return (
-              <motion.div key={tech.name} className="tech-pill"
-                initial={{ opacity: 0, scale: 0.5, y: 50 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1, type: 'spring', stiffness: 100 }}
-                whileHover={{ scale: 1.12, boxShadow: `0 0 30px ${tech.glow}40` }}
-                style={{ border: `1px solid ${tech.glow}30`, cursor: 'pointer' }}>
-                {/* Per-property transition for the looping animate — must use tween for 3 keyframes */}
-                <motion.span
-                  animate={{ y: [0, -amplitude, 0], rotate: [0, i % 2 === 0 ? 1.5 : -1.5, 0] }}
-                  transition={{ duration: 4 + i * 0.3, repeat: Infinity, ease: 'easeInOut', type: 'tween', delay: i * 0.4 }}
-                  style={{ fontSize: 22, display: 'block' }}>{tech.emoji}</motion.span>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: '#fff' }}>{tech.name}</div>
-                  <div style={{ fontWeight: 400, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{tech.sub}</div>
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
-}
 
 function FooterCTA() {
   return (
@@ -242,7 +187,7 @@ export default function HomePage() {
       <HeroSection />
       <div id="features"><ScrollFeatureCards /></div>
       <HowItWorksTimeline />
-      <TechStackSection />
+      <TechStackLayered />
       <FooterCTA />
     </div>
   )
