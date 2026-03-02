@@ -7,8 +7,11 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePres
 import {
   Upload, Play, Eye, Shield, TrendingUp, Globe,
   Zap, ChevronRight, Sparkles, Brain, Lock, Wifi,
-  Star, CheckCircle, ArrowRight, Network, Camera
+  Star, CheckCircle, ArrowRight, Network, Camera,
+  Home, User, Briefcase, FileText
 } from 'lucide-react'
+import { NavBar } from '@/components/ui/tubelight-navbar'
+import HowItWorksTimeline from "@/components/sections/how-it-works-timeline";
 
 // ─── Grid Background ───────────────────────────────────────────────────────────
 function GridBackground() {
@@ -39,62 +42,13 @@ function AmbientBlobs() {
   )
 }
 
-// ─── Navigation ────────────────────────────────────────────────────────────────
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', fn)
-    return () => window.removeEventListener('scroll', fn)
-  }, [])
-
-  return (
-    <motion.nav
-      initial={{ y: -60, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.7, ease: 'easeOut' }}
-      style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        padding: '0 40px', height: 72,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: scrolled ? 'rgba(6,6,16,0.85)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
-        transition: 'all 0.3s ease',
-      }}
-    >
-      <motion.div style={{ display: 'flex', alignItems: 'center', gap: 10 }} whileHover={{ scale: 1.03 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #00d4ff, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Sparkles size={18} color="#fff" />
-        </div>
-        <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.5px' }}>
-          Content<span className="gradient-text">IQ</span>
-        </span>
-      </motion.div>
-
-      <div style={{ display: 'flex', gap: 36, alignItems: 'center' }}>
-        {['Features', 'How It Works', 'Tech Stack'].map(link => (
-          <a key={link} href={`#${link.toLowerCase().replace(/ /g, '-')}`} className="nav-link">{link}</a>
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <Link href="/login">
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-            style={{ padding: '9px 22px', color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: 14, background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, cursor: 'pointer' }}>
-            Sign In
-          </motion.button>
-        </Link>
-        <Link href="/signup">
-          <motion.button className="glow-btn" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}
-            style={{ padding: '10px 22px', color: '#fff', fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-            Get Early Access <ChevronRight size={16} />
-          </motion.button>
-        </Link>
-      </div>
-    </motion.nav>
-  )
-}
+// ─── Navigation Items ──────────────────────────────────────────────────────────
+const navItems = [
+  { name: 'Home', url: '#hero', icon: Home },
+  { name: 'Features', url: '#features', icon: Eye },
+  { name: 'How It Works', url: '#how-it-works', icon: Briefcase },
+  { name: 'Tech Stack', url: '#tech-stack', icon: FileText },
+]
 
 // ─── Hero Section ──────────────────────────────────────────────────────────────
 function HeroSection() {
@@ -258,49 +212,6 @@ function BentoSection() {
   )
 }
 
-function HowItWorks() {
-  const steps = [
-    { icon: Upload, label: 'Upload', desc: 'Drop raw video footage from any device or cloud source.', color: '#00d4ff' },
-    { icon: Brain, label: 'Analyze', desc: 'Scene Intelligence dissects every frame in 3 seconds.', color: '#a855f7' },
-    { icon: Shield, label: 'Filter', desc: 'Privacy-first AI ensures compliance and authenticity.', color: '#f59e0b' },
-    { icon: TrendingUp, label: 'Optimize', desc: 'Trend Prediction finds the best format and timing.', color: '#10b981' },
-    { icon: Globe, label: 'Distribute', desc: 'Automated publishing to 40+ global platforms.', color: '#f43f5e' },
-  ]
-  return (
-    <section id="how-it-works" style={{ padding: '100px 24px', position: 'relative', zIndex: 1 }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} style={{ textAlign: 'center', marginBottom: 72 }}>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, letterSpacing: '-1px', marginBottom: 16 }}>
-            How <span className="gradient-text">ContentIQ</span> Works
-          </h2>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16 }}>From upload to viral in five AI-powered steps</p>
-        </motion.div>
-        <div style={{ display: 'flex', gap: 0, alignItems: 'flex-start', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {steps.map((step, i) => (
-            <div key={step.label} style={{ display: 'flex', alignItems: 'center' }}>
-              <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.12 }} whileHover={{ y: -8 }} style={{ textAlign: 'center', width: 170 }}>
-                <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3 + i * 0.3, repeat: Infinity, ease: 'easeInOut', delay: i * 0.5 }}
-                  style={{ width: 72, height: 72, borderRadius: 20, background: `${step.color}15`, border: `1px solid ${step.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: `0 0 30px ${step.color}20` }}>
-                  <step.icon size={28} color={step.color} />
-                </motion.div>
-                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{step.label}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>{step.desc}</div>
-              </motion.div>
-              {i < steps.length - 1 && (
-                <div style={{ padding: '0 8px', marginTop: -40 }}>
-                  <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, delay: i * 0.3, ease: 'easeInOut', type: 'tween' }} style={{ display: 'flex', gap: 4 }}>
-                    {[0, 1, 2].map(d => <div key={d} style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />)}
-                  </motion.div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 const TECH_STACK = [
   { name: 'AWS Lambda', sub: 'Serverless Compute', emoji: '⚡', glow: '#f59e0b' },
   { name: 'Amazon S3', sub: 'Object Storage', emoji: '🪣', glow: '#00d4ff' },
@@ -404,10 +315,10 @@ export default function HomePage() {
       <GridBackground />
       <PlexusBackground />
       <AmbientBlobs />
-      <Navbar />
+      <NavBar items={navItems} />
       <HeroSection />
       <BentoSection />
-      <HowItWorks />
+      <HowItWorksTimeline />
       <TechStackSection />
       <FooterCTA />
     </div>
