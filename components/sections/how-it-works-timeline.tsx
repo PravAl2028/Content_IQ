@@ -7,7 +7,7 @@ export default function HowItWorksTimeline() {
     {
       title: "Upload",
       content: (
-        <p className="text-neutral-300 text-sm md:text-base">
+        <p className="text-lg text-white/70 max-w-xl leading-relaxed group-hover:text-white transition-all duration-300">
           Drop raw video footage from any device or cloud source.
         </p>
       ),
@@ -15,7 +15,7 @@ export default function HowItWorksTimeline() {
     {
       title: "Analyze",
       content: (
-        <p className="text-neutral-300 text-sm md:text-base">
+        <p className="text-lg text-white/70 max-w-xl leading-relaxed group-hover:text-white transition-all duration-300">
           Scene Intelligence dissects every frame in seconds using AI.
         </p>
       ),
@@ -23,7 +23,7 @@ export default function HowItWorksTimeline() {
     {
       title: "Filter",
       content: (
-        <p className="text-neutral-300 text-sm md:text-base">
+        <p className="text-lg text-white/70 max-w-xl leading-relaxed group-hover:text-white transition-all duration-300">
           Privacy-first AI ensures compliance and authenticity.
         </p>
       ),
@@ -31,7 +31,7 @@ export default function HowItWorksTimeline() {
     {
       title: "Optimize",
       content: (
-        <p className="text-neutral-300 text-sm md:text-base">
+        <p className="text-lg text-white/70 max-w-xl leading-relaxed group-hover:text-white transition-all duration-300">
           Trend Prediction finds the best format and timing automatically.
         </p>
       ),
@@ -39,7 +39,7 @@ export default function HowItWorksTimeline() {
     {
       title: "Distribute",
       content: (
-        <p className="text-neutral-300 text-sm md:text-base">
+        <p className="text-lg text-white/70 max-w-xl leading-relaxed group-hover:text-white transition-all duration-300">
           Automated publishing to 40+ global platforms.
         </p>
       ),
