@@ -8,13 +8,23 @@ export interface SceneResult {
     start: number
     end: number
     engagementScore: number
+    viralityScore: number
     category: 'LOW' | 'AVERAGE' | 'HIGH'
     recommendation: 'Highlight' | 'Keep' | 'Trim' | 'Cut'
     sceneContent: string
+    audioContent: string      // Actual words spoken in this scene segment
     audienceReview: string
     whyItWorked: string | null
     whyItFailed: string | null
-    reshootGuide: { delivery: string; visual: string; script: string; duration: string }
+    reshootGuide: {
+        delivery: string
+        visual: string
+        script: string
+        duration: string
+        pacing: string
+        emotion: string
+        musicSuggestion: string
+    }
     deliveryQuality: number
     visualVariation: number
     semanticInterest: number
@@ -35,6 +45,20 @@ export interface AnalysisResult {
     lowEngagementCount: number
     highEngagementCount: number
     improvementTips: string[]
+    // New comprehensive metrics
+    categorySuitabilityScore: number
+    hookStrength: number
+    contentValue: number
+    informationDensity: number
+    deliveryStrength: number
+    visualQuality: number
+    editingQuality: number
+    emotionalImpact: number
+    competitorBenchmark: number
+    contentUniqueness: number
+    safetyScore: number
+    viralityScore: number
+    viralityPrediction: string
 }
 
 interface State {
@@ -42,6 +66,7 @@ interface State {
     uploadedKey: string | null;
     result: AnalysisResult | null;
     error: string | null;
+    category: string;
 }
 
 let state: State = {
@@ -49,6 +74,7 @@ let state: State = {
     uploadedKey: null,
     result: null,
     error: null,
+    category: "Tech Review",
 };
 
 type Listener = () => void;
@@ -74,6 +100,7 @@ export const videoIntelligenceStore = {
             uploadedKey: null,
             result: null,
             error: null,
+            category: "Tech Review",
         };
         notify();
     },
@@ -178,7 +205,7 @@ export async function startVideoAnalysis(file: File) {
         const resAnalyze = await fetch('/api/analyze-video', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ s3Key, durationSeconds, frames }),
+            body: JSON.stringify({ s3Key, durationSeconds, frames, category: state.category }),
         })
         const dataAnalyze = await resAnalyze.json()
 

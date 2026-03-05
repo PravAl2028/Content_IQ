@@ -1,5 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { BedrockRuntimeClient } from "@aws-sdk/client-bedrock-runtime";
+import { LambdaClient } from "@aws-sdk/client-lambda";
 
 const credentials = {
   accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID!,
@@ -14,6 +15,11 @@ export const s3 = new S3Client({
 });
 
 export const bedrock = new BedrockRuntimeClient({
+  region,
+  credentials,
+});
+
+export const lambda = new LambdaClient({
   region,
   credentials,
 });
