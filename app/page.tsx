@@ -66,7 +66,7 @@ function HeroSection() {
   }
 
   return (
-    <section id="home" onMouseMove={handleMouseMove}
+    <section onMouseMove={handleMouseMove}
       style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '120px 24px 100px', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
 
       <motion.div className="hero-glow"
@@ -184,10 +184,10 @@ export default function HomePage() {
       <PlexusBackground />
       <AmbientBlobs />
       <NavBar items={navItems} />
-      <HeroSection />
-      <div id="features"><ScrollFeatureCards /></div>
-      <div id="how-it-works"><HowItWorksTimeline /></div>
-      <div id="tech-stack"><TechStackLayered /></div>
+      <section id="home"><HeroSection /></section>
+      <section id="features"><ScrollFeatureCards /></section>
+      <section id="how-it-works"><HowItWorksTimeline /></section>
+      <section id="tech-stack"><TechStackLayered /></section>
       <FooterCTA />
     </div>
   )

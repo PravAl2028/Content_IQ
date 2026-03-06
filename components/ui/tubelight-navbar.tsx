@@ -22,14 +22,19 @@ export function NavBar({ items, className = '' }: NavBarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40)
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40)
+      if (window.scrollY < 200) {
+        setActiveNav('home')
+      }
+    }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   // Track which section is in view for active highlight
   useEffect(() => {
-    const sections = ["home", "features", "how-it-works", "tech-stack"]
+    const sections = document.querySelectorAll("section")
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -39,13 +44,12 @@ export function NavBar({ items, className = '' }: NavBarProps) {
           }
         })
       },
-      { threshold: 0.5 }
+      {
+        rootMargin: "-40% 0px -40% 0px"
+      }
     )
 
-    sections.forEach((id) => {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
-    })
+    sections.forEach((section) => observer.observe(section))
 
     return () => observer.disconnect()
   }, [])
