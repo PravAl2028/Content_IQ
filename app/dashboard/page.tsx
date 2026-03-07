@@ -122,7 +122,7 @@ export default function DashboardPage() {
         >
           <div className="z-10 flex flex-col items-start gap-2 max-w-sm">
             <h1 className="text-3xl font-bold mb-1">Welcome Back, {userName}!</h1>
-            <p className="text-blue-100 text-sm">Check your daily tasks and scheduals</p>
+            <p className="text-blue-100 text-sm">Let’s see what you’ve got going on today.</p>
           </div>
 
           {/* Decorative abstract elements matching reference */}
@@ -137,7 +137,7 @@ export default function DashboardPage() {
 
         {/* Quick Access Grid */}
         <div className="mt-4">
-          <h2 className="text-[16px] font-medium text-[var(--text-primary)] mb-4">Recent Activity</h2>
+          <h2 className="text-[16px] font-medium text-[var(--text-primary)] mb-4">Features Available </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {quickAccessItems.map((item, i) => (
               <Link href={item.href} key={i}>

@@ -3,7 +3,8 @@
 import { VideoAIIcon } from '@/components/icons/VideoAIIcon'
 import {
   Eye, Zap, TrendingUp, Clock, RefreshCcw, Shield,
-  ChevronDown, ChevronUp, Mic, Brain, Target, BarChart2
+  ChevronDown, ChevronUp, Mic, Brain, Target, BarChart2,
+  Video, FileText, Lightbulb, Music, Clapperboard, Lock, PartyPopper, Users
 } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
 import { useVideoIntelligenceStore, startVideoAnalysis, videoIntelligenceStore } from './store'
@@ -113,13 +114,13 @@ function ReshootGuide({ guide }: {
   }, [])
 
   const items = [
-    { label: '🎙️ Delivery', value: guide.delivery },
-    { label: '🎥 Visual', value: guide.visual },
-    { label: '📝 Script', value: guide.script },
-    { label: '⏱️ Duration', value: guide.duration },
-    { label: '⚡ Pacing', value: guide.pacing },
-    { label: '💡 Emotion', value: guide.emotion },
-    { label: '🎵 Music', value: guide.musicSuggestion },
+    { id: 'delivery', icon: Mic, label: 'Delivery', value: guide.delivery },
+    { id: 'visual', icon: Video, label: 'Visual', value: guide.visual },
+    { id: 'script', icon: FileText, label: 'Script', value: guide.script },
+    { id: 'duration', icon: Clock, label: 'Duration', value: guide.duration },
+    { id: 'pacing', icon: Zap, label: 'Pacing', value: guide.pacing },
+    { id: 'emotion', icon: Lightbulb, label: 'Emotion', value: guide.emotion },
+    { id: 'music', icon: Music, label: 'Music', value: guide.musicSuggestion },
   ]
   return (
     <div style={{ marginTop: 12, borderRadius: 10, border: '1px solid rgba(139,92,246,0.2)', overflow: 'hidden' }}>
@@ -132,15 +133,17 @@ function ReshootGuide({ guide }: {
         }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          🎬 Director’s Playbook
+          <Clapperboard size={14} /> Director’s Playbook
         </span>
         {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
       {open && (
         <div style={{ padding: '12px 14px', background: isDark ? 'rgba(18,14,40,0.7)' : '#ffffff', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {items.map(item => (
-            <div key={item.label} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 12, color: '#7c3aed', flexShrink: 0, width: 90, fontWeight: 600 }}>{item.label}</span>
+            <div key={item.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#7c3aed', flexShrink: 0, width: 90, fontWeight: 600 }}>
+                <item.icon size={13} /> {item.label}
+              </span>
               <span style={{ fontSize: 12.5, color: isDark ? '#e2e8f0' : '#111827', fontWeight: isDark ? 'normal' : 500, lineHeight: 1.6 }}>{item.value}</span>
             </div>
           ))}
@@ -282,10 +285,10 @@ export default function VideoIntelligencePage() {
             would react, then gives you exact reshoot instructions per scene.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 mb-10 mt-6">
-            <span className="text-[13px] font-semibold text-slate-800 dark:text-[#e2e8f0] bg-[#FFEDD5] dark:bg-purple-500/20 px-4 py-2 rounded-full dark:border dark:border-purple-500/40">🔒 Private & encrypted</span>
-            <span className="text-[13px] font-semibold text-slate-800 dark:text-[#e2e8f0] bg-[#F3E8FF] dark:bg-purple-500/20 px-4 py-2 rounded-full dark:border dark:border-purple-500/40">🎬 10-stage pipeline</span>
-            <span className="text-[13px] font-semibold text-slate-800 dark:text-[#e2e8f0] bg-[#DCFCE7] dark:bg-purple-500/20 px-4 py-2 rounded-full dark:border dark:border-purple-500/40">📊 Per-scene scoring</span>
-            <span className="text-[13px] font-semibold text-slate-800 dark:text-[#e2e8f0] bg-[#E0F2FE] dark:bg-purple-500/20 px-4 py-2 rounded-full dark:border dark:border-purple-500/40">🎯 Reshoot direction</span>
+            <span className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-[#e2e8f0] bg-[#FFEDD5] dark:bg-purple-500/20 px-4 py-2 rounded-full dark:border dark:border-purple-500/40"><Lock size={14} /> Private & encrypted</span>
+            <span className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-[#e2e8f0] bg-[#F3E8FF] dark:bg-purple-500/20 px-4 py-2 rounded-full dark:border dark:border-purple-500/40"><Clapperboard size={14} /> 10-stage pipeline</span>
+            <span className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-[#e2e8f0] bg-[#DCFCE7] dark:bg-purple-500/20 px-4 py-2 rounded-full dark:border dark:border-purple-500/40"><BarChart2 size={14} /> Per-scene scoring</span>
+            <span className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-[#e2e8f0] bg-[#E0F2FE] dark:bg-purple-500/20 px-4 py-2 rounded-full dark:border dark:border-purple-500/40"><Target size={14} /> Reshoot direction</span>
           </div>
 
           <div style={{ marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -388,8 +391,8 @@ export default function VideoIntelligencePage() {
       {/* ── Header bar ──────────────────────────────────────────────────────── */}
       <div className="bg-white dark:bg-[#120E28]/70 border border-slate-200 dark:border-purple-500/20 rounded-2xl px-6 py-4 flex items-center justify-between mb-6 shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] dark:backdrop-blur-md">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-purple-500/20 flex items-center justify-center">
-            <VideoAIIcon className="w-5 h-5 text-purple-400 dark:text-purple-300" />
+          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/20 flex items-center justify-center">
+            <VideoAIIcon className="w-5 h-5 text-purple-500 dark:text-slate-200" />
           </div>
           <div>
             <div className="font-bold text-[17px] text-slate-900 dark:text-white">Intelligence Report</div>
@@ -427,8 +430,8 @@ export default function VideoIntelligencePage() {
             <span className="font-bold text-[15px] text-slate-900 dark:text-white">Recommended Deletions</span>
           </div>
           {lowScenes.length === 0 ? (
-            <div className="bg-[#f0fdf4] dark:bg-[#22c55e]/[0.08] border border-[#bbf7d0] dark:border-[#22c55e]/20 rounded-xl px-4 py-3.5 text-[14px] text-[#166534] dark:text-[#4ade80] italic">
-              No critical drop-off zones detected 🎉
+            <div className="flex items-center gap-2 bg-[#f0fdf4] dark:bg-[#22c55e]/[0.08] border border-[#bbf7d0] dark:border-[#22c55e]/20 rounded-xl px-4 py-3.5 text-[14px] text-[#166534] dark:text-[#4ade80] italic">
+              No critical drop-off zones detected <PartyPopper size={16} />
             </div>
           ) : (
             <div className="flex flex-col gap-2.5">
@@ -618,20 +621,18 @@ export default function VideoIntelligencePage() {
                         </div>
                       </div>
 
-                      {/* What Nova actually saw in this scene (real frame analysis) */}
                       {scene.sceneContent && (
                         <div className="flex items-start gap-2.5 bg-white dark:bg-[#38bdf8]/[0.06] border border-gray-200 dark:border-[#38bdf8]/15 rounded-lg py-2 px-3 mb-2.5">
-                          <span className="text-[14px] shrink-0">👥</span>
+                          <Users size={15} className="shrink-0 mt-[1.5px] text-slate-700 dark:text-[#7dd3fc]" />
                           <span className="text-[13px] text-slate-700 dark:text-[#7dd3fc] leading-snug font-medium">
                             {scene.sceneContent}
                           </span>
                         </div>
                       )}
 
-                      {/* Audio content — what was actually said in this scene */}
                       {scene.audioContent && scene.audioContent !== '[No audio transcript for this scene]' && (
                         <div className="flex items-start gap-2.5 bg-white dark:bg-[#a855f7]/[0.07] border border-gray-200 dark:border-[#a855f7]/20 rounded-lg py-2 px-3 mb-2.5">
-                          <span className="text-[14px] shrink-0">🎤</span>
+                          <Mic size={15} className="shrink-0 mt-[2px] text-slate-500 dark:text-[#a78bfa]" />
                           <div>
                             <div className="text-[10px] text-slate-500 dark:text-[#a78bfa] font-bold tracking-wider uppercase mb-1">Spoken Audio</div>
                             <span className="text-[13px] text-slate-600 dark:text-[#e9d5ff] leading-relaxed italic font-medium">

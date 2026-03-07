@@ -9,7 +9,7 @@ export default function TranslatorPage() {
                     <GlobeAltIcon style={{ width: 22, height: 22, color: '#a855f7' }} />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-purple-700 dark:text-white dark:font-bold">Multilingual Dubbing</h1>
+                    <h1 className="text-2xl font-bold tracking-tight text-black dark:text-white dark:font-bold">Multilingual Dubbing</h1>
                     <p className="text-sm text-slate-600 dark:text-[#A1A1AA]">Translate Audio and Text files across Multiple Languages</p>
                 </div>
             </div>

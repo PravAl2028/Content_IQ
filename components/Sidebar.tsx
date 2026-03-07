@@ -50,9 +50,6 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="flex items-center gap-3 px-[14px] py-6 whitespace-nowrap" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
         <img src="/logo.png" alt="ContentIQ Logo" className="h-9 w-9 object-contain flex-shrink-0" />
-        <span className="text-lg font-bold tracking-tight opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap" style={{ color: 'var(--text-primary)' }}>
-          Content<span className="gradient-text">IQ</span>
-        </span>
       </div>
 
       {/* Nav */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { ShareIcon, SparklesIcon, CheckCircleIcon, DocumentDuplicateIcon, LinkIcon, PaperAirplaneIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useDistributionStore, distributionStore, generateDistributionPlan, PlatformContent, DistributionPlan } from "./store";
 
@@ -40,40 +41,34 @@ export default function DistributionPage() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto w-full" style={{ backgroundColor: "var(--bg-main)" }}>
+    <div className="flex-1 overflow-y-auto w-full p-6 lg:p-8 space-y-8" style={{ backgroundColor: "var(--bg-main)" }}>
       {/* Header */}
-      <header
-        className="sticky top-0 z-10 px-6 py-4 lg:px-8 border-b bg-white/80 dark:bg-[rgba(9,9,11,0.8)] backdrop-blur-xl border-slate-200 dark:border-[var(--border-color)]"
-      >
-        <div className="flex items-center gap-3">
-          <div className="p-2 lg:p-2.5 rounded-xl lg:rounded-2xl bg-[#f3e8ff] dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20">
-            <ShareIcon className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-fuchsia-400" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <div className="flex items-center gap-3 mb-1">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20"
+            style={{ background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <ShareIcon style={{ width: 24, height: 24, color: 'white' }} />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-              Social Distribution
-            </h1>
-            <p className="text-sm lg:text-base text-slate-500 dark:text-zinc-400 mt-0.5 lg:mt-1">
-              Generate platform-optimized titles, descriptions, and hashtags using Amazon Nova.
-            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Social Distribution</h1>
+            <p className="text-sm text-slate-500 dark:text-gray-400">Generate platform-optimized titles, descriptions, and hashtags using Amazon Nova.</p>
           </div>
         </div>
-      </header>
+      </motion.div>
 
-      <main className="p-6 lg:p-8 w-full mx-auto space-y-8">
+      <div className="w-full mx-auto space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
           {/* Input Section */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="p-6 rounded-2xl border bg-white dark:bg-[var(--card-bg)] border-slate-200 dark:border-[var(--border-color)] shadow-sm dark:shadow-none">
+            <div className="p-6 rounded-2xl border bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                <SparklesIcon className="w-5 h-5 text-purple-500 dark:text-fuchsia-400" />
                 Video Details
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     Video Title <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
                   <input
@@ -81,12 +76,12 @@ export default function DistributionPage() {
                     value={title}
                     onChange={(e) => distributionStore.setState({ title: e.target.value })}
                     placeholder="e.g. Building an AI App in 10 Minutes"
-                    className="w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-black/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 dark:focus:ring-fuchsia-500/50 transition-all border-slate-300 dark:border-[var(--border-subtle)]"
+                    className="w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 dark:focus:ring-fuchsia-500/50 transition-all border-slate-300 dark:border-slate-700"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     Category
                   </label>
                   <input
@@ -94,12 +89,12 @@ export default function DistributionPage() {
                     value={category}
                     onChange={(e) => distributionStore.setState({ category: e.target.value })}
                     placeholder="e.g. Technology, Education, Vlog"
-                    className="w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-black/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 dark:focus:ring-fuchsia-500/50 transition-all border-slate-300 dark:border-[var(--border-subtle)]"
+                    className="w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 dark:focus:ring-fuchsia-500/50 transition-all border-slate-300 dark:border-slate-700"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     Video Description <span className="text-red-500 dark:text-red-400">*</span>
                   </label>
                   <textarea
@@ -107,12 +102,12 @@ export default function DistributionPage() {
                     onChange={(e) => distributionStore.setState({ description: e.target.value })}
                     placeholder="Briefly describe what your video is about..."
                     rows={4}
-                    className="w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-black/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 dark:focus:ring-fuchsia-500/50 transition-all resize-none border-slate-300 dark:border-[var(--border-subtle)]"
+                    className="w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 dark:focus:ring-fuchsia-500/50 transition-all resize-none border-slate-300 dark:border-slate-700"
                   />
                 </div>
 
-                <div className="pt-2 border-t border-slate-200 dark:border-[var(--border-subtle)]">
-                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     <LinkIcon className="w-4 h-4 text-purple-500 dark:text-fuchsia-400" />
                     Sources & Links <span className="text-xs text-slate-400 dark:text-zinc-500 font-normal">(Optional)</span>
                   </label>
@@ -121,12 +116,12 @@ export default function DistributionPage() {
                     onChange={(e) => distributionStore.setState({ sourceLinks: e.target.value })}
                     placeholder="Paste URLs, articles, or references here..."
                     rows={2}
-                    className="w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-black/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 dark:focus:ring-fuchsia-500/50 transition-all resize-none mb-3 border-slate-300 dark:border-[var(--border-subtle)]"
+                    className="w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 dark:focus:ring-fuchsia-500/50 transition-all resize-none mb-3 border-slate-300 dark:border-slate-700"
                   />
 
                   {sourceLinks.trim().length > 0 && (
-                    <div className="p-3 rounded-xl bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/5 space-y-2">
-                      <p className="text-xs text-slate-500 dark:text-zinc-400">Include these links in:</p>
+                    <div className="p-3 rounded-xl bg-gray-50 dark:bg-slate-900/60 border border-gray-200 dark:border-slate-800 space-y-2">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Include these links in:</p>
                       <div className="flex flex-wrap gap-2">
                         {PLATFORMS.map((platform) => {
                           const isSelected = selectedPlatformsForSources.includes(platform.id);
@@ -136,7 +131,7 @@ export default function DistributionPage() {
                               onClick={() => togglePlatform(platform.id)}
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all border ${isSelected
                                 ? `${platform.bg} ${platform.border} ${platform.color}`
-                                : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-700 dark:hover:text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200'
                                 }`}
                             >
                               {platform.name}
@@ -165,12 +160,11 @@ export default function DistributionPage() {
                 >
                   {loading ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-5 h-5  border-white/30 border-t-white rounded-full animate-spin" />
                       <span>Generating...</span>
                     </>
                   ) : (
                     <>
-                      <SparklesIcon className="w-5 h-5" />
                       Generate Plan
                     </>
                   )}
@@ -194,7 +188,7 @@ export default function DistributionPage() {
                   return (
                     <div
                       key={platform.id}
-                      className="p-6 rounded-2xl border transition-all hover:shadow-lg bg-white dark:bg-[var(--card-bg)] border-slate-200 dark:border-[var(--border-color)] shadow-sm dark:shadow-none"
+                      className="p-6 rounded-2xl border transition-all hover:shadow-lg bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none"
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${platform.bg} ${platform.border}`}>
@@ -226,7 +220,7 @@ export default function DistributionPage() {
                       </div>
 
                       <div className="space-y-4">
-                        <div className="p-4 rounded-xl bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/5 whitespace-pre-wrap text-black dark:text-zinc-300 text-sm leading-relaxed">
+                        <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 whitespace-pre-wrap text-black dark:text-slate-300 text-sm leading-relaxed">
                           {platformData.content}
                         </div>
 
@@ -246,8 +240,8 @@ export default function DistributionPage() {
                 })}
               </div>
             ) : loading ? (
-              <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-8 text-center rounded-2xl border bg-white dark:bg-[var(--card-bg)] border-slate-200 dark:border-[var(--border-color)] shadow-sm dark:shadow-none">
-                <div className="w-16 h-16 mb-6 rounded-2xl flex items-center justify-center bg-purple-50 dark:bg-[linear-gradient(135deg,rgba(139,92,246,0.1),rgba(217,70,239,0.1))]">
+              <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-8 text-center rounded-2xl border bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none">
+                <div className="w-16 h-16 mb-6 rounded-2xl flex items-center justify-center bg-purple-50 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/20">
                   <ShareIcon className="w-8 h-8 text-purple-500 dark:text-fuchsia-400 animate-pulse" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">Generating Your Distribution Plan</h3>
@@ -268,7 +262,7 @@ export default function DistributionPage() {
                 <style>{`@keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }`}</style>
               </div>
             ) : (
-              <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-8 text-center rounded-2xl border border-dashed border-slate-300 dark:border-[var(--border-subtle)] bg-slate-50/50 dark:bg-[rgba(255,255,255,0.02)]">
+              <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-8 text-center rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40">
                 <div className="w-16 h-16 mb-4 rounded-2xl flex items-center justify-center"
                   style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.1), rgba(217,70,239,0.1))" }}>
                   <ShareIcon className="w-8 h-8 text-fuchsia-400 opacity-50" />
@@ -282,7 +276,7 @@ export default function DistributionPage() {
           </div>
 
         </div>
-      </main>
+      </div>
 
       {/* Share Modal */}
       {shareModalOpen && (

@@ -133,8 +133,8 @@ export default function LoginPage() {
             </motion.button>
           </form>
 
-          <p className="text-xs text-center mt-6" style={{ color: 'rgba(255,255,255,0.2)' }}>
-            Demo credentials pre-filled for you ✨
+          <p className="flex items-center justify-center gap-1.5 text-xs mt-6" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            Demo credentials pre-filled for you <Sparkles size={14} className="text-purple-400" />
           </p>
         </div>
       </motion.div>

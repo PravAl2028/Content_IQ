@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DocumentTextIcon } from '@heroicons/react/24/outline'
-import { Sparkles, Copy, Check, Rocket, ScrollText, Clock, BarChart3, TrendingUp, Zap, Target, ChevronRight } from 'lucide-react'
+import { Sparkles, Copy, Check, Rocket, ScrollText, Clock, BarChart3, TrendingUp, Zap, Target, ChevronRight, AlertTriangle } from 'lucide-react'
 import { useScriptGeneratorStore, scriptGeneratorStore, generateScript } from './store'
 
 const TONES = ['Casual', 'Educational', 'Storytelling', 'Professional', 'Humorous', 'Mysterious']
@@ -140,9 +140,7 @@ export default function ScriptGeneratorPage() {
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
             className="bg-white/95 dark:bg-white/5 dark:backdrop-blur-xl rounded-[20px] dark:rounded-[2rem] p-6 shadow-sm dark:shadow-none border border-gray-100 dark:border-white/10 space-y-6 max-w-sm">
             <div className="flex items-center gap-2 mb-2">
-              <div className="p-1.5 rounded-lg bg-teal-50 dark:bg-cyan-500/20 text-teal-400 dark:text-cyan-400">
-                <Sparkles size={18} />
-              </div>
+
               <h2 className="font-bold text-[13px] dark:text-sm uppercase tracking-widest text-slate-700 dark:text-gray-300">Configuration</h2>
             </div>
             <div className="space-y-5">
@@ -229,7 +227,7 @@ export default function ScriptGeneratorPage() {
             {error && (
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                 className="mt-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] leading-relaxed">
-                <div className="font-bold flex items-center gap-1.5 mb-1 text-xs text-red-300">⚠️ Model Error</div>
+                <div className="font-bold flex items-center gap-1.5 mb-1 text-xs text-red-300"><AlertTriangle size={14} /> Model Error</div>
                 {error}
                 <div className="mt-2 text-[10px] opacity-60">Tip: Check if us.amazon.nova-premier-v1:0 access is granted.</div>
               </motion.div>

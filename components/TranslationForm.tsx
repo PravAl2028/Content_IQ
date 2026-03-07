@@ -99,10 +99,10 @@ export default function TranslationForm() {
                         </div>
 
                         {/* ElevenLabs Voice Customization options */}
-                        <div className="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4 space-y-4">
+                        <div className="bg-white dark:bg-purple-500/5 border border-gray-200 dark:border-purple-500/20 rounded-xl p-4 space-y-4">
                             <h4 className="text-sm font-semibold text-purple-600 dark:text-purple-300 flex items-center gap-2">
                                 <Languages className="w-4 h-4" />
-                                Voice Style (ElevenLabs)
+                                Voice Style
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
@@ -138,16 +138,16 @@ export default function TranslationForm() {
                         <div className="flex-1 space-y-3">
                             <div className="flex items-center justify-between">
                                 <label className="block text-sm font-medium text-gray-900 dark:text-zinc-300">Input Content</label>
-                                <div className="flex bg-zinc-900/80 rounded-lg p-1 border border-zinc-800">
+                                <div className="flex bg-gray-100 dark:bg-zinc-900/80 rounded-lg p-1 border border-gray-200 dark:border-zinc-800">
                                     <button
                                         onClick={() => translatorStore.setState({ inputMode: "file" })}
-                                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${inputMode === "file" ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300" : "text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-300"}`}
+                                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${inputMode === "file" ? "bg-white shadow-sm dark:shadow-none dark:bg-purple-500/20 text-purple-700 dark:text-purple-300" : "text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-300"}`}
                                     >
                                         Upload File
                                     </button>
                                     <button
                                         onClick={() => translatorStore.setState({ inputMode: "text" })}
-                                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${inputMode === "text" ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300" : "text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-300"}`}
+                                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${inputMode === "text" ? "bg-white shadow-sm dark:shadow-none dark:bg-purple-500/20 text-purple-700 dark:text-purple-300" : "text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-300"}`}
                                     >
                                         Paste Text
                                     </button>
@@ -157,7 +157,7 @@ export default function TranslationForm() {
                             {inputMode === "file" ? (
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
-                                    className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-8 h-[200px] text-center cursor-pointer transition-all ${file ? 'border-purple-500/50 bg-purple-500/5' : 'border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30'}`}
+                                    className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-8 h-[200px] text-center cursor-pointer transition-all ${file ? 'border-purple-500/50 bg-purple-50 dark:bg-purple-500/5' : 'border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500 bg-gray-50 hover:bg-gray-100 dark:bg-transparent dark:hover:bg-zinc-800/30'}`}
                                 >
                                     <input
                                         type="file"
@@ -177,8 +177,8 @@ export default function TranslationForm() {
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center gap-4">
-                                            <div className="w-12 h-12 rounded-full bg-zinc-800/50 flex items-center justify-center">
-                                                <UploadCloud className="w-6 h-6 text-zinc-400" />
+                                            <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-zinc-800/50 flex items-center justify-center">
+                                                <UploadCloud className="w-6 h-6 text-gray-500 dark:text-zinc-400" />
                                             </div>
                                             <div>
                                                 <p className="text-sm font-medium text-gray-900 dark:text-zinc-300">Click or drag file to upload</p>

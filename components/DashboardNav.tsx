@@ -50,9 +50,8 @@ export default function DashboardNav() {
       <div className="flex items-center gap-6">
         {/* Dashboard Title / Breadcrumb */}
         <div className="hidden sm:flex items-center gap-3">
-          <img src="/logo.png" alt="ContentIQ Logo" className="h-8 w-8 object-contain" />
           <span className="text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-            {getPageTitle()}
+            Content<span className="text-purple-600 dark:text-purple-400">IQ</span>
           </span>
         </div>
       </div>
@@ -60,23 +59,8 @@ export default function DashboardNav() {
       {/* ── Right: Theme + Notifications + Profile ─────────────────────────────── */}
       <div className="flex items-center gap-3">
         <ThemeToggle />
-
-        {/* Notification Bell */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="relative p-[10px] rounded-xl transition-all duration-300 flex items-center justify-center group"
-          style={{
-            background: 'var(--btn-bg)',
-            border: '1px solid var(--border-color)',
-          }}
-        >
-          <Bell size={18} className="transition-colors" style={{ color: 'var(--text-secondary)' }} />
-          <div className="absolute top-[8px] right-[8px] w-[6px] h-[6px] bg-[#38BDF8] rounded-full shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
-        </motion.button>
-
         {/* User Card Button (Profile) */}
-        <div className="relative">
+        <div className="relative" onMouseLeave={() => setDropdownOpen(false)}>
           <motion.button
             whileHover={{ scale: 1.01 }}
             onClick={() => setDropdownOpen(o => !o)}
@@ -127,18 +111,7 @@ export default function DashboardNav() {
                     <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{name}</div>
                     <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{email}</div>
                   </div>
-                  {[
-                    { icon: User, label: 'Profile' },
-                    { icon: Settings, label: 'Settings' },
-                  ].map(item => (
-                    <button key={item.label}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors text-left hover:bg-black/[0.04] dark:hover:bg-white/[0.05]"
-                      style={{ color: 'var(--text-secondary)' }}>
-                      <item.icon size={16} />
-                      {item.label}
-                    </button>
-                  ))}
-                  <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                  <div>
                     <button
                       onClick={() => signOut({ callbackUrl: '/login' })}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors text-left hover:bg-red-500/[0.08]"
