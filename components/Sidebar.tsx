@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { VideoAIIcon } from './icons/VideoAIIcon'
 import {
   HomeIcon,
-  SparklesIcon,
   DocumentTextIcon,
   ShareIcon,
   ShieldCheckIcon,
@@ -17,7 +17,7 @@ import {
 
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { label: 'Video Intelligence', href: '/dashboard/video-intelligence', icon: SparklesIcon },
+  { label: 'Video Intelligence', href: '/dashboard/video-intelligence', icon: VideoAIIcon },
   { label: 'Script Generator', href: '/dashboard/script-generator', icon: DocumentTextIcon },
   { label: 'Distribution', href: '/dashboard/distribution', icon: ShareIcon },
   { label: 'Privacy Filter', href: '/dashboard/privacy-filter', icon: ShieldCheckIcon },

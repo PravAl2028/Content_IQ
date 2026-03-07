@@ -5,10 +5,11 @@ import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Clock, Sparkles, FileText, Share2, Shield, Mic, Image as ImageIcon, Music, TrendingUp, Zap } from 'lucide-react'
 import Link from 'next/link'
+import { VideoAIIcon } from '@/components/icons/VideoAIIcon'
 
 // Quick Access Items
 const quickAccessItems = [
-  { label: 'Video Intelligence', icon: Sparkles, color: 'text-[#38bdf8]', href: '/dashboard/video-intelligence' },
+  { label: 'Video Intelligence', icon: VideoAIIcon, color: 'text-[#38bdf8]', href: '/dashboard/video-intelligence' },
   { label: 'Script Generator', icon: FileText, color: 'text-[#a855f7]', href: '/dashboard/script-generator' },
   { label: 'Distribution', icon: Share2, color: 'text-[#10b981]', href: '/dashboard/distribution' },
   { label: 'Privacy Filter', icon: Shield, color: 'text-[#fbbf24]', href: '/dashboard/privacy-filter' },

@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 type Theme = 'dark' | 'light'
 
@@ -20,14 +21,24 @@ export function useTheme() {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark')
+  const pathname = usePathname()
 
-  // On mount: read saved preference, default to dark
+  const isDashboard = pathname?.startsWith('/dashboard') || false
+
+  // On mount or path change: read saved preference, default to dark
   useEffect(() => {
-    const saved = localStorage.getItem('theme') as Theme | null
-    const resolved: Theme = saved === 'light' ? 'light' : 'dark'
-    setTheme(resolved)
-    applyTheme(resolved)
-  }, [])
+    if (isDashboard) {
+      // In dashboard, respect saved preference
+      const saved = localStorage.getItem('theme') as Theme | null
+      const resolved: Theme = saved === 'light' ? 'light' : 'dark'
+      setTheme(resolved)
+      applyTheme(resolved)
+    } else {
+      // Outside dashboard, force dark mode
+      setTheme('dark')
+      applyTheme('dark')
+    }
+  }, [isDashboard])
 
   function applyTheme(t: Theme) {
     const root = document.documentElement
@@ -39,6 +50,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   function toggleTheme() {
+    if (!isDashboard) return // Only allow toggling in dashboard
+
     setTheme(prev => {
       const next: Theme = prev === 'dark' ? 'light' : 'dark'
       localStorage.setItem('theme', next)

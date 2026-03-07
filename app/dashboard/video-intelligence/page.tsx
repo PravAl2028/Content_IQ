@@ -1,6 +1,6 @@
 'use client'
 
-import { SparklesIcon } from '@heroicons/react/24/outline'
+import { VideoAIIcon } from '@/components/icons/VideoAIIcon'
 import {
   Eye, Zap, TrendingUp, Clock, RefreshCcw, Shield,
   ChevronDown, ChevronUp, Mic, Brain, Target, BarChart2
@@ -152,7 +152,7 @@ function AnalysisProgress({ currentStage }: { currentStage: number }) {
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
           <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[#F3E8FF] dark:bg-purple-500/15 border border-[#E9D5FF] dark:border-purple-500/40 animate-[spin_2.5s_linear_infinite]">
-            <SparklesIcon className="w-7 h-7 text-[#A855F7] dark:text-purple-400" />
+            <VideoAIIcon className="w-7 h-7 text-[#A855F7] dark:text-purple-400" />
           </div>
         </div>
         <h2 className="text-[20px] font-bold mb-1.5 text-slate-800 dark:text-white">Analyzing your video</h2>
@@ -239,7 +239,7 @@ export default function VideoIntelligencePage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#F1F5F9] dark:bg-[#38BDF8]/12 border border-slate-200 dark:border-[#38BDF8]/25">
-            <SparklesIcon className="w-5 h-5 text-slate-700 dark:text-[#38BDF8]" />
+            <VideoAIIcon className="w-5 h-5 text-slate-700 dark:text-[#38BDF8]" />
           </div>
           <div>
             <h1 className="text-[22px] font-bold tracking-tight text-slate-900 dark:text-white">Video Intelligence</h1>
@@ -252,7 +252,7 @@ export default function VideoIntelligencePage() {
         {/* Upload box */}
         <div className="bg-[#F8FAFC] dark:bg-white/5 dark:backdrop-blur-xl rounded-[32px] p-12 flex flex-col items-center justify-center text-center shadow-sm dark:shadow-none border border-slate-200/60 dark:border-white/10 dark:border-dashed"
           style={{ minHeight: 460 }}>
-          <SparklesIcon className="w-10 h-10 text-[#312E81] dark:text-purple-400/60 mb-6" />
+          <VideoAIIcon className="w-10 h-10 text-[#312E81] dark:text-purple-400/60 mb-6" />
           <h3 className="text-[22px] dark:text-lg font-bold dark:font-semibold mb-3 text-slate-900 dark:text-white tracking-tight">Upload your video for private evaluation</h3>
           <p className="text-[14px] dark:text-sm mb-2 text-slate-600 dark:text-[#A1A1AA] leading-relaxed font-medium dark:font-normal" style={{ maxWidth: 520 }}>
             Your video stays private — never indexed, never shared. The AI simulates how a real audience
@@ -334,7 +334,7 @@ export default function VideoIntelligencePage() {
       <div className="bg-white dark:bg-[#120E28]/70 border border-slate-200 dark:border-purple-500/20 rounded-2xl px-6 py-4 flex items-center justify-between mb-6 shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] dark:backdrop-blur-md">
         <div className="flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-purple-500/20 flex items-center justify-center">
-            <SparklesIcon className="w-5 h-5 text-purple-400 dark:text-purple-300" />
+            <VideoAIIcon className="w-5 h-5 text-purple-400 dark:text-purple-300" />
           </div>
           <div>
             <div className="font-bold text-[17px] text-slate-900 dark:text-white">Intelligence Report</div>
@@ -419,20 +419,19 @@ export default function VideoIntelligencePage() {
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
             {(() => {
+              const scenesLen = result.scenes.length || 1
+              const avgDelivery = Math.round(result.scenes.reduce((acc, s) => acc + (s.deliveryQuality || 0), 0) / scenesLen)
+              const avgVisual = Math.round(result.scenes.reduce((acc, s) => acc + (s.visualVariation || 0), 0) / scenesLen)
+              const avgSemantic = Math.round(result.scenes.reduce((acc, s) => acc + (s.semanticInterest || 0), 0) / scenesLen)
+
               const signals = [
-                { label: 'Category Suitability', val: result.categorySuitabilityScore, icon: Target, c: '#a855f7' },
-                { label: 'Hook Strength', val: result.hookStrength, icon: Zap, c: '#eab308' },
-                { label: 'Content Value', val: result.contentValue, icon: Brain, c: '#22c55e' },
-                { label: 'Information Density', val: result.informationDensity, icon: BarChart2, c: '#0ea5e9' },
-                { label: 'Delivery Strength', val: result.deliveryStrength, icon: Mic, c: '#8b5cf6' },
-                { label: 'Visual Quality', val: result.visualQuality, icon: Eye, c: '#10b981' },
-                { label: 'Editing Quality', val: result.editingQuality, icon: Clock, c: '#ec4899' },
-                { label: 'Emotional Impact', val: result.emotionalImpact, icon: TrendingUp, c: '#ef4444' },
-                { label: 'Competitor Benchmark', val: result.competitorBenchmark, icon: Target, c: '#f59e0b' },
-                { label: 'Content Uniqueness', val: result.contentUniqueness, icon: SparklesIcon, c: '#d946ef' },
+                { label: 'Speech & Delivery', val: avgDelivery, icon: Mic, c: '#8b5cf6' },
+                { label: 'Visual Variation', val: avgVisual, icon: Eye, c: '#10b981' },
+                { label: 'Semantic Interest', val: avgSemantic, icon: Zap, c: '#eab308' },
+                { label: 'Overall Score', val: result.avgEngagementScore, icon: Target, c: '#38bdf8' },
               ]
-              // Taking top 8 to fit perfectly in a 4x2 grid like the image
-              return signals.slice(0, 8).map(s => (
+
+              return signals.map(s => (
                 <div key={s.label} className="border border-slate-200 dark:border-[#2A2440] rounded-[18px] p-4 sm:p-5 flex flex-col justify-between h-full min-h-[160px] bg-white dark:bg-transparent shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-none">
                   <div className="flex items-center justify-between mb-4">
                     <s.icon size={22} style={{ color: s.c }} />
@@ -469,7 +468,7 @@ export default function VideoIntelligencePage() {
             { label: 'Editing Quality', value: result.editingQuality, icon: Clock, c: '#ec4899' },
             { label: 'Emotional Impact', value: result.emotionalImpact, icon: TrendingUp, c: '#ef4444' },
             { label: 'Competitor Benchmark', value: result.competitorBenchmark, icon: Target, c: '#f59e0b' },
-            { label: 'Content Uniqueness', value: result.contentUniqueness, icon: SparklesIcon, c: '#d946ef' },
+            { label: 'Content Uniqueness', value: result.contentUniqueness, icon: VideoAIIcon, c: '#d946ef' },
             { label: 'Safety Confidence', value: result.safetyScore, icon: Shield, c: '#14b8a6' }
           ].map(m => (
             <div key={m.label} className="bg-white dark:bg-[#120E28]/70 border border-slate-200 dark:border-purple-500/20 rounded-xl p-4 flex flex-col gap-2.5 shadow-sm dark:shadow-none dark:backdrop-blur-md">
