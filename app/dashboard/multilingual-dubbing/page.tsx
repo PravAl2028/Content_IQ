@@ -16,8 +16,8 @@ export default function MultilingualDubbingPage() {
             <GlobeAltIcon style={{ width: 22, height: 22, color: '#a855f7' }} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Multilingual Dubbing</h1>
-            <p className="text-sm" style={{ color: '#A1A1AA' }}>Auto-dub and subtitle your content in 50+ languages</p>
+            <h1 className="text-2xl font-bold tracking-tight text-purple-600 dark:text-white">Multilingual Dubbing</h1>
+            <p className="text-sm text-slate-500 dark:text-[#A1A1AA]">Auto-dub and subtitle your content in 50+ languages</p>
           </div>
         </div>
       </motion.div>

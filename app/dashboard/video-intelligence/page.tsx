@@ -5,8 +5,9 @@ import {
   Eye, Zap, TrendingUp, Clock, RefreshCcw, Shield,
   ChevronDown, ChevronUp, Mic, Brain, Target, BarChart2
 } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useVideoIntelligenceStore, startVideoAnalysis, videoIntelligenceStore } from './store'
+import * as Select from '@radix-ui/react-select'
 
 // ── static feature cards (upload screen) ──────────────────────────────────────
 const FEATURES = [
@@ -89,6 +90,28 @@ function ReshootGuide({ guide }: {
   }
 }) {
   const [open, setOpen] = useState(false)
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof document !== 'undefined') {
+      return document.documentElement.classList.contains('dark')
+    }
+    return true
+  })
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'))
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          setIsDark(document.documentElement.classList.contains('dark'))
+        }
+      })
+    })
+
+    observer.observe(document.documentElement, { attributes: true })
+    return () => observer.disconnect()
+  }, [])
+
   const items = [
     { label: '🎙️ Delivery', value: guide.delivery },
     { label: '🎥 Visual', value: guide.visual },
@@ -104,8 +127,8 @@ function ReshootGuide({ guide }: {
         onClick={() => setOpen(o => !o)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '9px 14px', background: 'rgba(139,92,246,0.08)', border: 'none',
-          cursor: 'pointer', color: '#c4b5fd', fontSize: 12.5, fontWeight: 600,
+          padding: '9px 14px', background: isDark ? 'rgba(139,92,246,0.08)' : '#f5f3ff', border: 'none',
+          cursor: 'pointer', color: isDark ? '#c4b5fd' : '#6d28d9', fontSize: 12.5, fontWeight: 600,
         }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -114,11 +137,11 @@ function ReshootGuide({ guide }: {
         {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
       {open && (
-        <div style={{ padding: '12px 14px', background: 'rgba(10,5,30,0.5)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ padding: '12px 14px', background: isDark ? 'rgba(18,14,40,0.7)' : '#ffffff', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {items.map(item => (
             <div key={item.label} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
               <span style={{ fontSize: 12, color: '#7c3aed', flexShrink: 0, width: 90, fontWeight: 600 }}>{item.label}</span>
-              <span style={{ fontSize: 12.5, color: '#e2e8f0', lineHeight: 1.6 }}>{item.value}</span>
+              <span style={{ fontSize: 12.5, color: isDark ? '#e2e8f0' : '#111827', fontWeight: isDark ? 'normal' : 500, lineHeight: 1.6 }}>{item.value}</span>
             </div>
           ))}
         </div>
@@ -238,7 +261,7 @@ export default function VideoIntelligencePage() {
       <div className="space-y-8 w-full">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 dark:bg-[#38BDF8]/12 border border-slate-200 dark:border-[#38BDF8]/25">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
             <VideoAIIcon className="w-5 h-5 text-slate-700 dark:text-[#38BDF8]" />
           </div>
           <div>
@@ -267,20 +290,52 @@ export default function VideoIntelligencePage() {
 
           <div style={{ marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
             <label className="text-[14px] text-slate-800 dark:text-slate-400 font-medium">Select Category:</label>
-            <select
+            <Select.Root
               value={category}
-              onChange={(e) => videoIntelligenceStore.setState({ category: e.target.value })}
-              className="bg-white dark:bg-purple-500/15 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-purple-500/60 rounded-xl px-4 py-2 text-[14px] dark:text-sm outline-none cursor-pointer font-medium shadow-sm dark:shadow-none transition-colors focus:ring-2 focus:ring-purple-500/20"
+              onValueChange={(val) => videoIntelligenceStore.setState({ category: val })}
             >
-              <option value="Tech Review">Tech Review</option>
-              <option value="Comedy">Comedy</option>
-              <option value="Cooking">Cooking</option>
-              <option value="Educational">Educational</option>
-              <option value="Vlog">Vlog</option>
-              <option value="Gaming">Gaming</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="General">General</option>
-            </select>
+              <Select.Trigger className="bg-white dark:bg-[#1f1e2e] text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2 text-[14px] outline-none cursor-pointer font-medium shadow-sm dark:shadow-none flex items-center justify-between gap-2 min-w-[140px] transition-colors focus:ring-2 focus:ring-purple-500/20">
+                <Select.Value placeholder="Select Category" />
+                <Select.Icon>
+                  <ChevronDown size={14} className="opacity-50" />
+                </Select.Icon>
+              </Select.Trigger>
+
+              <Select.Portal>
+                <Select.Content
+                  position="popper"
+                  side="bottom"
+                  sideOffset={4}
+                  className="bg-white dark:bg-[#52525e] text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-[#676775] rounded-[10px] shadow-lg overflow-hidden z-50 min-w-[var(--radix-select-trigger-width)]"
+                >
+                  <Select.Viewport className="p-1">
+                    {[
+                      'Tech Review',
+                      'Comedy',
+                      'Cooking',
+                      'Educational',
+                      'Vlog',
+                      'Gaming',
+                      'Entertainment',
+                      'General'
+                    ].map((cat) => (
+                      <Select.Item
+                        key={cat}
+                        value={cat}
+                        className="text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 focus:bg-slate-100 dark:focus:bg-white/10 cursor-pointer text-[14px] px-8 py-2 outline-none rounded-[6px] relative flex items-center transition-colors"
+                      >
+                        <Select.ItemText>{cat}</Select.ItemText>
+                        <Select.ItemIndicator className="absolute left-2 inline-flex items-center justify-center">
+                          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3355 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.55529 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+                          </svg>
+                        </Select.ItemIndicator>
+                      </Select.Item>
+                    ))}
+                  </Select.Viewport>
+                </Select.Content>
+              </Select.Portal>
+            </Select.Root>
           </div>
 
           <input type="file" accept="video/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
@@ -363,9 +418,9 @@ export default function VideoIntelligencePage() {
       </div>
 
       {/* ── Bento row: signal overview ───────────────────────────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_200px_minmax(0,1.9fr)] gap-5 mb-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_200px_minmax(0,1.9fr)] gap-5 mb-5 items-start">
 
-        {/* Low engagement & Actions */}
+        {/* Low engagement */}
         <div className="bg-white dark:bg-[#120E28]/70 border border-slate-200 dark:border-purple-500/20 rounded-[24px] p-6 shadow-sm dark:shadow-none dark:backdrop-blur-md">
           <div className="flex items-center gap-2 mb-5">
             <div className="w-2 h-2 rounded-full bg-[#ef4444] shadow-[0_0_8px_rgba(239,68,68,0.7)]" />
@@ -376,31 +431,14 @@ export default function VideoIntelligencePage() {
               No critical drop-off zones detected 🎉
             </div>
           ) : (
-          <div className="flex flex-col gap-2.5">
-            {lowScenes.map((s, i) => (
-              <div key={i} className="bg-[#fef2f2] dark:bg-[#ef4444]/[0.09] border border-[#fecaca] dark:border-[#ef4444]/20 rounded-xl px-4 py-3.5 text-[14px] text-[#991b1b] dark:text-[#fca5a5]">
-                <strong className="text-slate-900 dark:text-white">{s.timestamp}</strong> — {s.whyItFailed ?? 'Low engagement zone'}
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="h-px bg-gray-200 dark:bg-purple-500/10 my-6" />
-
-        <div className="flex items-center gap-2 mb-4">
-            <div className="w-2 h-2 rounded-full bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.7)]" />
-            <span className="font-bold text-[15px] text-slate-900 dark:text-white">Improvement Actions</span>
-          </div>
-          <div className="flex flex-col gap-3">
-            {improvementTips.map((tip, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mt-[2.5px] shrink-0">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-                <span className="text-[13px] text-slate-700 dark:text-[#cbd5e1] leading-relaxed">{tip}</span>
-              </div>
-            ))}
-          </div>
+            <div className="flex flex-col gap-2.5">
+              {lowScenes.map((s, i) => (
+                <div key={i} className="bg-[#fef2f2] dark:bg-[#ef4444]/[0.09] border border-[#fecaca] dark:border-[#ef4444]/20 rounded-xl px-4 py-3.5 text-[14px] text-[#991b1b] dark:text-[#fca5a5]">
+                  <strong className="text-slate-900 dark:text-white">{s.timestamp}</strong> — {s.whyItFailed ?? 'Low engagement zone'}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Avg score ring */}
@@ -413,11 +451,11 @@ export default function VideoIntelligencePage() {
           </div>
         </div>
 
-        {/* Signal breakdown - refactoring inside to grid layout exactly like screenshot */}
-        <div className="bg-white dark:bg-[#120E28]/70 border border-slate-200 dark:border-purple-500/20 rounded-[24px] p-6 lg:p-7 shadow-sm dark:shadow-none dark:backdrop-blur-md flex flex-col">
+        {/* Signal breakdown */}
+        <div className="bg-white dark:bg-[#120E28]/70 border border-slate-200 dark:border-purple-500/20 rounded-[24px] p-6 lg:p-7 shadow-sm dark:shadow-none dark:backdrop-blur-md">
           <div className="font-bold text-[18px] mb-6 text-slate-900 dark:text-white tracking-wide">Signal Breakdown (avg)</div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {(() => {
               const scenesLen = result.scenes.length || 1
               const avgDelivery = Math.round(result.scenes.reduce((acc, s) => acc + (s.deliveryQuality || 0), 0) / scenesLen)
@@ -432,21 +470,52 @@ export default function VideoIntelligencePage() {
               ]
 
               return signals.map(s => (
-                <div key={s.label} className="border border-slate-200 dark:border-[#2A2440] rounded-[18px] p-4 sm:p-5 flex flex-col justify-between h-full min-h-[160px] bg-white dark:bg-transparent shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-none">
+                <div key={s.label} className="border border-slate-200 dark:border-[#2A2440] rounded-[16px] p-4 lg:p-5 flex flex-col justify-between bg-white dark:bg-transparent shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-none min-h-[130px]">
+
+                  {/* Icon + percentage – top row */}
                   <div className="flex items-center justify-between mb-4">
-                    <s.icon size={22} style={{ color: s.c }} />
-                    <span className="font-extrabold text-[20px]" style={{ color: s.c }}>{s.val}%</span>
+                    <s.icon size={20} style={{ color: s.c }} />
+                    <span className="font-extrabold text-[22px] tracking-tight leading-none" style={{ color: s.c }}>
+                      {s.val}%
+                    </span>
                   </div>
+
+                  {/* Label + progress bar */}
                   <div>
-                    <div className="text-[14px] font-bold text-slate-800 dark:text-white/90 mb-3 leading-tight pr-4">{s.label}</div>
-                    <div className="h-[5px] rounded-full bg-gray-200 dark:bg-[#2A2440] overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${s.val}%`, backgroundColor: s.c }} />
+                    <div className="text-[13.5px] font-bold text-slate-800 dark:text-white/90 leading-tight mb-2.5">
+                      {s.label}
+                    </div>
+                    <div className="h-[5px] rounded-full bg-slate-100 dark:bg-[#2A2440] overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${s.val}%`, backgroundColor: s.c }}
+                      />
                     </div>
                   </div>
+
                 </div>
               ))
             })()}
           </div>
+
+        </div>
+      </div>
+
+      {/* ── Improvement Actions (separate card below the bento row) ────────── */}
+      <div className="bg-white dark:bg-[#120E28]/70 border border-slate-200 dark:border-purple-500/20 rounded-[24px] p-6 shadow-sm dark:shadow-none dark:backdrop-blur-md mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-2 h-2 rounded-full bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.7)]" />
+          <span className="font-bold text-[15px] text-slate-900 dark:text-white">Improvement Actions</span>
+        </div>
+        <div className="flex flex-col gap-3">
+          {improvementTips.map((tip, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mt-[2.5px] shrink-0">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              <span className="text-[13px] text-slate-700 dark:text-[#cbd5e1] leading-relaxed">{tip}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -509,7 +578,7 @@ export default function VideoIntelligencePage() {
       <div className="mb-8">
         <div className="flex items-center gap-2.5 mb-5">
           <Target className="w-[18px] h-[18px] text-purple-600 dark:text-[#a78bfa]" />
-          <h2 className="font-bold text-[17px] text-[#c4b5fd] dark:text-white">Scene-by-Scene Intelligence Timeline</h2>
+          <h2 className="font-bold text-[17px] text-slate-800 dark:text-white">Scene-by-Scene Intelligence Timeline</h2>
         </div>
 
         <div className="bg-white dark:bg-[#120E28]/70 border border-slate-200 dark:border-purple-500/20 rounded-3xl p-6 sm:p-8 shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] dark:backdrop-blur-md relative">
@@ -532,7 +601,7 @@ export default function VideoIntelligencePage() {
                     </div>
 
                     {/* Scene card */}
-                    <div className="flex-1 bg-white dark:bg-[#0F0A23]/60 border border-slate-200 dark:border-purple-500/15 rounded-[14px] p-4 sm:p-5 shadow-sm dark:shadow-none">
+                    <div className="flex-1 bg-white dark:bg-[#0F0A23]/60 border border-slate-200 dark:border-purple-500/15 rounded-[14px] p-4  shadow-sm dark:shadow-none">
 
                       {/* Top row */}
                       <div className="flex items-center gap-2.5 mb-3 flex-wrap">

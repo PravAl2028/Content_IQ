@@ -261,7 +261,6 @@ export default function ScriptGeneratorPage() {
                   <Rocket className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-cyan-400" size={24} />
                 </div>
                 <div className="text-center space-y-3">
-                  <h3 className="hidden dark:block text-xl font-bold text-white tracking-tight">Architecting Content...</h3>
                   <div className="flex gap-2 justify-center">
                     {[0, 1, 2].map(i => (
                       <motion.div key={i} animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1, 0.8] }} transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.1 }}
