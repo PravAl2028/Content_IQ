@@ -397,36 +397,36 @@ export default function ScriptGeneratorPage() {
                     ) : (
                       <div className="space-y-6">
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                          className="p-8 rounded-[2.5rem] bg-red-500/5 border border-red-500/10 shadow-2xl relative overflow-hidden group">
-                          <div className="absolute -top-4 -right-4 opacity-5 group-hover:scale-110 transition-transform">
-                            <Target size={120} />
+                          className="p-8 rounded-[2.5rem] bg-red-50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-2xl relative overflow-hidden group">
+                          <div className="absolute -top-4 -right-4 opacity-10 dark:opacity-5 group-hover:scale-110 transition-transform">
+                            <Target size={120} className="text-red-500 dark:text-current" />
                           </div>
-                          <h3 className="text-red-400 font-black text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
+                          <h3 className="text-red-600 dark:text-red-400 font-black text-xs uppercase tracking-widest mb-4 flex items-center gap-2 relative z-10">
                             <Zap size={16} /> Compulsory Viral Hook
                           </h3>
-                          <p className="text-lg text-white leading-relaxed font-bold tracking-tight italic">"{s.hook}"</p>
+                          <p className="text-lg text-slate-800 dark:text-white leading-relaxed font-bold tracking-tight italic relative z-10">"{s.hook}"</p>
                         </motion.div>
 
                         <div className="space-y-4">
-                          <h3 className="text-cyan-400 font-black text-xs uppercase tracking-widest ml-4 mb-2 flex items-center gap-2">
+                          <h3 className="text-cyan-600 dark:text-cyan-400 font-black text-xs uppercase tracking-widest ml-4 mb-2 flex items-center gap-2">
                             <ScrollText size={16} /> High-Value Segments
                           </h3>
                           {(s.valuePoints || []).map((vp: any, i: number) => (
                             <motion.div key={i} initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                              className="p-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 group hover:border-cyan-500/20 transition-all hover:bg-white/[0.04]">
+                              className="p-6 rounded-[2.5rem] bg-white dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none group hover:border-cyan-200 dark:hover:border-cyan-500/20 transition-all hover:bg-slate-50 dark:hover:bg-white/[0.04]">
                               <div className="flex gap-6">
-                                <div className="mt-1 w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-xs font-black text-cyan-400 shrink-0">
+                                <div className="mt-1 w-12 h-12 rounded-2xl bg-cyan-50 dark:bg-cyan-500/10 flex items-center justify-center text-xs font-black text-cyan-600 dark:text-cyan-400 shrink-0">
                                   {String(i + 1).padStart(2, '0')}
                                 </div>
                                 <div className="flex-1 space-y-4">
-                                  <p className="text-base text-gray-200 font-medium leading-[1.7]">{vp.point}</p>
-                                  <div className="p-4 rounded-[1.5rem] bg-indigo-500/5 border border-indigo-500/10 relative overflow-hidden">
-                                    <div className="flex items-center gap-2 text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                                  <p className="text-base text-slate-800 dark:text-gray-200 font-medium leading-[1.7]">{vp.point}</p>
+                                  <div className="p-4 rounded-[1.5rem] bg-indigo-50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/10 relative overflow-hidden">
+                                    <div className="flex items-center gap-2 text-[8px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2 relative z-10">
                                       <Rocket size={12} /> B-Roll Visual Recommendation
                                     </div>
-                                    <p className="text-[13px] text-indigo-200/60 leading-relaxed italic">{vp.broll}</p>
-                                    <div className="absolute top-0 right-0 p-2 opacity-5">
-                                      <Target size={40} />
+                                    <p className="text-[13px] text-slate-600 dark:text-indigo-200/60 leading-relaxed italic relative z-10">{vp.broll}</p>
+                                    <div className="absolute top-0 right-0 p-2 opacity-10 dark:opacity-5">
+                                      <Target size={40} className="text-indigo-500 dark:text-current" />
                                     </div>
                                   </div>
                                 </div>
@@ -436,12 +436,12 @@ export default function ScriptGeneratorPage() {
                         </div>
 
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                          className="p-8 rounded-[2.5rem] bg-green-500/5 border border-green-500/10 text-center relative overflow-hidden group shadow-lg">
-                          <div className="absolute inset-0 bg-gradient-to-t from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <h3 className="text-green-400 font-black text-xs uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
+                          className="p-8 rounded-[2.5rem] bg-green-50 dark:bg-green-500/5 border border-green-100 dark:border-green-500/10 text-center relative overflow-hidden group shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-lg">
+                          <div className="absolute inset-0 bg-gradient-to-t from-green-100/50 dark:from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <h3 className="text-green-600 dark:text-green-400 font-black text-xs uppercase tracking-widest mb-3 flex items-center justify-center gap-2 relative z-10">
                             <Check size={16} /> Community CTA
                           </h3>
-                          <p className="text-base text-gray-200 leading-relaxed font-bold tracking-tight italic">"{s.cta}"</p>
+                          <p className="text-base text-slate-800 dark:text-gray-200 leading-relaxed font-bold tracking-tight italic relative z-10">"{s.cta}"</p>
                         </motion.div>
                       </div>
                     )}
