@@ -240,140 +240,105 @@ Return ONLY valid JSON:
   ]
 }`;
 
-        // ─── Promise 1: Audio Transcription (Hybrid Architecture) ───
+        // ─── Promise 1: Audio Transcription (AWS Transcribe SDK) ───
         const transcribePromise = (async () => {
             try {
-                if (realDuration <= 90) {
-                    console.log(`[Parallel] Starting native AWS Transcribe job for ${s3Key} (Duration: ${realDuration}s <= 90s)`);
-                    const transcribeClient = new TranscribeClient({
-                        region: "us-east-1",
-                        credentials: {
-                            accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID!,
-                            secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY!,
-                        },
-                    });
+                console.log(`[Parallel] Starting native AWS Transcribe job for ${s3Key} (Duration: ${realDuration}s)`);
+                const transcribeClient = new TranscribeClient({
+                    region: "us-east-1",
+                    credentials: {
+                        accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID!,
+                        secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY!,
+                    },
+                });
 
-                    const mediaUri = `s3://${bucket}/${s3Key}`;
-                    const jobName = `vid-intel-transcribe-${Date.now()}`;
+                const mediaUri = `s3://${bucket}/${s3Key}`;
+                const jobName = `vid-intel-transcribe-${Date.now()}`;
 
-                    await transcribeClient.send(new StartTranscriptionJobCommand({
-                        TranscriptionJobName: jobName,
-                        Media: { MediaFileUri: mediaUri },
-                        LanguageCode: "en-US",
+                await transcribeClient.send(new StartTranscriptionJobCommand({
+                    TranscriptionJobName: jobName,
+                    Media: { MediaFileUri: mediaUri },
+                    LanguageCode: "en-US",
+                }));
+
+                let jobStatus = "IN_PROGRESS";
+                let transcriptUri = "";
+                while (jobStatus === "IN_PROGRESS" || jobStatus === "QUEUED") {
+                    await new Promise((resolve) => setTimeout(resolve, 3000));
+                    const st = await transcribeClient.send(new GetTranscriptionJobCommand({
+                        TranscriptionJobName: jobName
                     }));
+                    jobStatus = st.TranscriptionJob?.TranscriptionJobStatus || "FAILED";
 
-                    let jobStatus = "IN_PROGRESS";
-                    let transcriptUri = "";
-                    while (jobStatus === "IN_PROGRESS" || jobStatus === "QUEUED") {
-                        await new Promise((resolve) => setTimeout(resolve, 3000));
-                        const st = await transcribeClient.send(new GetTranscriptionJobCommand({
-                            TranscriptionJobName: jobName
-                        }));
-                        jobStatus = st.TranscriptionJob?.TranscriptionJobStatus || "FAILED";
+                    if (jobStatus === "COMPLETED") {
+                        transcriptUri = st.TranscriptionJob?.Transcript?.TranscriptFileUri || "";
+                    }
+                    if (jobStatus === "FAILED" || jobStatus === "ERROR") {
+                        console.warn("[Parallel] Transcription job failed:", st.TranscriptionJob?.FailureReason);
+                        return;
+                    }
+                }
 
-                        if (jobStatus === "COMPLETED") {
-                            transcriptUri = st.TranscriptionJob?.Transcript?.TranscriptFileUri || "";
+                if (transcriptUri) {
+                    const transcriptRes = await fetch(transcriptUri);
+                    const transcriptData = await transcriptRes.json();
+
+                    // Need to rebuild exact expected semantic structure: [ { start, end, text } ]
+                    const items = transcriptData.results?.items || [];
+                    const formattedTranscriptList = [];
+                    let currentSegmentText = "";
+                    let currentSegmentStart = 0;
+                    let currentSegmentEnd = 0;
+
+                    if (items.length > 0) {
+                        for (let i = 0; i < items.length; i++) {
+                            const item = items[i];
+                            if (item.type === "pronunciation") {
+                                const start = parseFloat(item.start_time);
+                                const end = parseFloat(item.end_time);
+                                const text = item.alternatives[0].content;
+
+                                if (currentSegmentText === "") {
+                                    currentSegmentStart = start;
+                                    currentSegmentEnd = end;
+                                    currentSegmentText = text;
+                                } else {
+                                    currentSegmentEnd = end;
+                                    currentSegmentText += " " + text;
+                                }
+
+                                // Break into ~3 second chunks or at punctuation
+                                if (end - currentSegmentStart >= 3.0 || item.alternatives[0].content.match(/[.!?,]/)) {
+                                    formattedTranscriptList.push({
+                                        start: currentSegmentStart,
+                                        end: currentSegmentEnd,
+                                        text: currentSegmentText.trim()
+                                    });
+                                    currentSegmentText = "";
+                                }
+                            } else if (item.type === "punctuation") {
+                                currentSegmentText += item.alternatives[0].content;
+                                if (formattedTranscriptList.length > 0 && currentSegmentText === item.alternatives[0].content) {
+                                    formattedTranscriptList[formattedTranscriptList.length - 1].text += item.alternatives[0].content;
+                                    currentSegmentText = "";
+                                }
+                            }
                         }
-                        if (jobStatus === "FAILED" || jobStatus === "ERROR") {
-                            console.warn("[Parallel] Transcription job failed:", st.TranscriptionJob?.FailureReason);
-                            return;
+
+                        // Push remainder
+                        if (currentSegmentText !== "") {
+                            formattedTranscriptList.push({
+                                start: currentSegmentStart,
+                                end: currentSegmentEnd,
+                                text: currentSegmentText.trim()
+                            });
                         }
                     }
 
-                    if (transcriptUri) {
-                        const transcriptRes = await fetch(transcriptUri);
-                        const transcriptData = await transcriptRes.json();
-
-                        // Need to rebuild exact expected semantic structure: [ { start, end, text } ]
-                        const items = transcriptData.results?.items || [];
-                        const formattedTranscriptList = [];
-                        let currentSegmentText = "";
-                        let currentSegmentStart = 0;
-                        let currentSegmentEnd = 0;
-
-                        if (items.length > 0) {
-                            for (let i = 0; i < items.length; i++) {
-                                const item = items[i];
-                                if (item.type === "pronunciation") {
-                                    const start = parseFloat(item.start_time);
-                                    const end = parseFloat(item.end_time);
-                                    const text = item.alternatives[0].content;
-
-                                    if (currentSegmentText === "") {
-                                        currentSegmentStart = start;
-                                        currentSegmentEnd = end;
-                                        currentSegmentText = text;
-                                    } else {
-                                        currentSegmentEnd = end;
-                                        currentSegmentText += " " + text;
-                                    }
-
-                                    // Break into ~3 second chunks or at punctuation
-                                    if (end - currentSegmentStart >= 3.0 || item.alternatives[0].content.match(/[.!?,]/)) {
-                                        formattedTranscriptList.push({
-                                            start: currentSegmentStart,
-                                            end: currentSegmentEnd,
-                                            text: currentSegmentText.trim()
-                                        });
-                                        currentSegmentText = "";
-                                    }
-                                } else if (item.type === "punctuation") {
-                                    currentSegmentText += item.alternatives[0].content;
-                                    if (formattedTranscriptList.length > 0 && currentSegmentText === item.alternatives[0].content) {
-                                        formattedTranscriptList[formattedTranscriptList.length - 1].text += item.alternatives[0].content;
-                                        currentSegmentText = "";
-                                    }
-                                }
-                            }
-
-                            // Push remainder
-                            if (currentSegmentText !== "") {
-                                formattedTranscriptList.push({
-                                    start: currentSegmentStart,
-                                    end: currentSegmentEnd,
-                                    text: currentSegmentText.trim()
-                                });
-                            }
-                        }
-
-                        if (formattedTranscriptList.length > 0) {
-                            spokenTranscript = JSON.stringify(formattedTranscriptList);
-                            console.log(`[Parallel] AWS Transcribe successful (${formattedTranscriptList.length} segments)`);
-                        }
+                    if (formattedTranscriptList.length > 0) {
+                        spokenTranscript = JSON.stringify(formattedTranscriptList);
+                        console.log(`[Parallel] AWS Transcribe successful (${formattedTranscriptList.length} segments)`);
                     }
-                } else {
-                    console.log(`[Parallel] Starting Local Faster-Whisper pipeline for ${s3Key} (Duration: ${realDuration}s > 90s)`);
-                    const { execFile } = require('child_process');
-                    const path = require('path');
-
-                    // Spawn the python script using the presigned URL
-                    const scriptPath = path.join(process.cwd(), 'lib', 'transcribe.py');
-                    const venvPythonPath = path.join(process.cwd(), '.venv', 'bin', 'python');
-
-                    await new Promise<void>((resolve, reject) => {
-                        execFile(venvPythonPath, [scriptPath, presignedUrl], { maxBuffer: 1024 * 1024 * 10 }, (error: any, stdout: string, stderr: string) => {
-                            if (error) {
-                                console.error('[Parallel] Faster-Whisper error:', error);
-                                console.error('[Parallel] stderr:', stderr);
-                                reject(error);
-                            } else {
-                                try {
-                                    const segments = JSON.parse(stdout);
-                                    if (Array.isArray(segments) && segments.length > 0) {
-                                        spokenTranscript = JSON.stringify(segments);
-                                        console.log(`[Parallel] Local Faster-Whisper successful (${segments.length} segments)`);
-                                    } else {
-                                        console.warn('[Parallel] Faster-Whisper returned empty JSON segment array.');
-                                    }
-                                    resolve();
-                                } catch (parseError) {
-                                    console.error('[Parallel] Failed to parse JSON from python script:', parseError);
-                                    console.error('[Parallel] raw output:', stdout.slice(0, 500));
-                                    reject(parseError);
-                                }
-                            }
-                        });
-                    });
                 }
             } catch (err) {
                 console.error("[Parallel] Failed transcription block:", err);
