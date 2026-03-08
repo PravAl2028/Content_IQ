@@ -630,7 +630,7 @@ export default function VideoIntelligencePage() {
                         </div>
                       )}
 
-                      {scene.audioContent && scene.audioContent !== '[No audio transcript for this scene]' && (
+                      {scene.audioContent && (
                         <div className="flex items-start gap-2.5 bg-white dark:bg-[#a855f7]/[0.07] border border-gray-200 dark:border-[#a855f7]/20 rounded-lg py-2 px-3 mb-2.5">
                           <Mic size={15} className="shrink-0 mt-[2px] text-slate-500 dark:text-[#a78bfa]" />
                           <div>

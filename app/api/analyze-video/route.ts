@@ -4,6 +4,7 @@ import { GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { InvokeCommand } from "@aws-sdk/client-lambda";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3, bedrock, lambda } from "@/lib/aws";
+import { TranscribeClient, StartTranscriptionJobCommand, GetTranscriptionJobCommand } from "@aws-sdk/client-transcribe";
 
 export const runtime = "nodejs";
 export const maxDuration = 300; // Allow 5 full minutes for Lambda + Nova Pro Pipeline
@@ -21,7 +22,7 @@ async function invokeNova(
     const fullPrompt = `${systemPrompt}\n\n${userContent}`;
     const body = JSON.stringify({
         messages: [{ role: "user", content: [{ text: fullPrompt }] }],
-        inferenceConfig: { maxTokens: 2048, temperature: 0.4, topP: 0.9 },
+        inferenceConfig: { maxTokens: 8192, temperature: 0.4, topP: 0.9 },
     });
     const cmd = new InvokeModelCommand({ modelId, contentType: "application/json", accept: "application/json", body });
     const res = await bedrock.send(cmd);
@@ -71,7 +72,9 @@ function safeJson<T>(raw: string, fallback: T): T {
             raw.match(/\{[\s\S]*\}/) ||
             raw.match(/\[[\s\S]*\]/);
         return JSON.parse(match ? match[1] ?? match[0] : raw);
-    } catch {
+    } catch (e) {
+        console.warn("[safeJson] JSON parse FAILED — using fallback. Error:", (e as Error).message);
+        console.warn("[safeJson] Raw output (last 200 chars):", raw.slice(-200));
         return fallback;
     }
 }
@@ -194,11 +197,14 @@ export async function POST(req: Request) {
         let spokenTranscript = "No audio transcript available.";
         let timelineData: any[] = [];
 
-        // Determine interval size: 1s for <30s, 2s for <120s, scaling up safely
-        const intervalSize = realDuration <= 30 ? 1 : realDuration <= 120 ? 2 : Math.max(3, Math.ceil(realDuration / 60));
+        // Divide video into exactly 18 intervals
         const intervals = [];
-        for (let i = 0; i < realDuration; i += intervalSize) {
-            intervals.push({ start: i, end: Math.min(i + intervalSize, realDuration) });
+        const intervalExact = realDuration / 18;
+        for (let i = 0; i < 18; i++) {
+            intervals.push({
+                start: Math.round(i * intervalExact * 10) / 10,
+                end: Math.round(Math.min((i + 1) * intervalExact, realDuration) * 10) / 10
+            });
         }
 
         const timelinePrompt = `You are analyzing a ${realDuration}-second video. I have provided ${videoFrames.length} frame images captured at different timestamps throughout the video.
@@ -234,37 +240,56 @@ Return ONLY valid JSON:
   ]
 }`;
 
-        // ─── Promise 1: Audio Transcription (Lambda) ───
+        // ─── Promise 1: Audio Transcription (AWS Transcribe SDK) ───
         const transcribePromise = (async () => {
             try {
-                const lambdaName = process.env.TRANSCRIBE_LAMBDA_NAME;
-                if (!lambdaName) {
-                    console.warn("Skipping transcription - TRANSCRIBE_LAMBDA_NAME is not set.");
-                    return;
-                }
-                console.log(`[Parallel] Invoking Transcript Lambda: ${lambdaName} for ${s3Key}`);
-                const invokeCmd = new InvokeCommand({
-                    FunctionName: lambdaName,
-                    InvocationType: "RequestResponse",
-                    Payload: JSON.stringify({
-                        body: JSON.stringify({ s3Key, bucketName: bucket })
-                    })
+                console.log(`[Parallel] Starting native AWS Transcribe job for ${s3Key}`);
+                const transcribeClient = new TranscribeClient({
+                    region: "us-east-1",
+                    credentials: {
+                        accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID!,
+                        secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY!,
+                    },
                 });
 
-                const lambdaRes = await lambda.send(invokeCmd);
-                const responsePayload = JSON.parse(new TextDecoder().decode(lambdaRes.Payload));
+                const mediaUri = `s3://${bucket}/${s3Key}`;
+                const jobName = `vid-intel-transcribe-${Date.now()}`;
 
-                if (responsePayload.statusCode === 200 && responsePayload.body) {
-                    const parsedBody = JSON.parse(responsePayload.body);
-                    if (parsedBody.transcript) {
-                        spokenTranscript = parsedBody.transcript;
+                await transcribeClient.send(new StartTranscriptionJobCommand({
+                    TranscriptionJobName: jobName,
+                    Media: { MediaFileUri: mediaUri },
+                    LanguageCode: "en-US",
+                }));
+
+                let jobStatus = "IN_PROGRESS";
+                let transcriptUri = "";
+                while (jobStatus === "IN_PROGRESS" || jobStatus === "QUEUED") {
+                    await new Promise((resolve) => setTimeout(resolve, 3000));
+                    const st = await transcribeClient.send(new GetTranscriptionJobCommand({
+                        TranscriptionJobName: jobName
+                    }));
+                    jobStatus = st.TranscriptionJob?.TranscriptionJobStatus || "FAILED";
+
+                    if (jobStatus === "COMPLETED") {
+                        transcriptUri = st.TranscriptionJob?.Transcript?.TranscriptFileUri || "";
+                    }
+                    if (jobStatus === "FAILED" || jobStatus === "ERROR") {
+                        console.warn("[Parallel] Transcription job failed:", st.TranscriptionJob?.FailureReason);
+                        return;
+                    }
+                }
+
+                if (transcriptUri) {
+                    const transcriptRes = await fetch(transcriptUri);
+                    const transcriptData = await transcriptRes.json();
+                    const text = transcriptData.results?.transcripts?.[0]?.transcript || "";
+                    if (text) {
+                        spokenTranscript = text;
                         console.log(`[Parallel] Transcribed audio successfully (${spokenTranscript.length} chars)`);
                     }
-                } else {
-                    console.warn("[Parallel] Lambda returned an error or empty transcript:", responsePayload);
                 }
-            } catch (lambdaErr) {
-                console.error("[Parallel] Failed to invoke transcription Lambda:", lambdaErr);
+            } catch (err) {
+                console.error("[Parallel] Failed native block transcribing:", err);
             }
         })();
 
@@ -276,7 +301,7 @@ Return ONLY valid JSON:
                     NOVA_LITE,
                     "You are a multimodal video timeline analyzer. Analyze each frame image separately based on its timestamp. Output only JSON.",
                     timelinePrompt,
-                    videoFrames.slice(0, 20)
+                    videoFrames.slice(0, 18)
                 );
 
                 const parsed = safeJson<{ timeline: any[] }>(timelineRaw, { timeline: [] });
@@ -412,6 +437,9 @@ Return ONLY valid JSON:
             };
         });
 
+        console.log("=== GROUPED SCENES (sent to Nova Review) ===");
+        finalGroupedScenes.forEach(s => console.log(`  ${s.sceneId}: ${fmt(s.start)}–${fmt(s.end)} | eng=${s.engagementScore} | content=${s.sceneContent?.substring(0, 50)}`));
+
         // ════════════════════════════════════════════════════════════════════
         // STAGE 6 — Human-Like Review & Reshoot Direction
         // ════════════════════════════════════════════════════════════════════
@@ -419,7 +447,7 @@ Return ONLY valid JSON:
 The full video transcript is provided. For each scene, extract the approximate spoken words that fall within its timestamp range.
 
 For each scene below, write:
-1. AUDIO CONTENT — The specific words/sentences spoken during this scene's timestamp. Extract directly from the transcript below. If none, write "[No spoken audio]"
+1. AUDIO CONTENT — The specific words/sentences spoken during this scene's timestamp. Extract directly from the transcript below. If none, or if the transcript is empty, write "[Transcription unavailable (API quota exceeded or no audio detected)]"
 2. An AUDIENCE REVIEW — 1–2 sentences written in first-person viewer voice ("I felt...", "This part made me...")
 3. WHY IT WORKED — if the engagement score is >= 65, explain what made it work (1 sentence). Otherwise "null".
 4. WHY IT FAILED — if the engagement score is < 65, explain what caused disengagement (1 sentence). Otherwise "null".
@@ -501,7 +529,12 @@ Return ONLY valid JSON (matching this schema perfectly):
             }))
         });
 
+        console.log("=== PARSED REVIEW DATA ===");
+        console.log(`Review scenes count: ${reviewData.scenes.length}`);
+        reviewData.scenes.forEach(r => console.log(`  ${r.sceneId}: audio=${r.audioContent?.substring(0, 60)}...`));
+
         const reviewMap = new Map(reviewData.scenes.map(r => [r.sceneId, r]));
+        console.log(`Review map keys: ${Array.from(reviewMap.keys()).join(', ')}`);
 
         // ════════════════════════════════════════════════════════════════════
         // STAGE 7 — Final Intelligence Assembly
@@ -519,7 +552,7 @@ Return ONLY valid JSON (matching this schema perfectly):
                 category: scene.category,
                 recommendation: scene.recommendation,
                 sceneContent: scene.sceneContent,
-                audioContent: review?.audioContent ?? "[No audio transcript for this scene]",
+                audioContent: review?.audioContent ?? "[Transcription unavailable (API quota exceeded or no audio detected)]",
                 audienceReview: review?.audienceReview ?? "",
                 whyItWorked: review?.whyItWorked ?? null,
                 whyItFailed: review?.whyItFailed ?? null,
@@ -537,6 +570,9 @@ Return ONLY valid JSON (matching this schema perfectly):
                 semanticInterest: scene.semanticInterest,
             };
         });
+
+        console.log("=== FINAL SCENES SENT TO FRONTEND ===");
+        finalScenes.forEach(s => console.log(`  ${s.sceneId}: ${s.timestamp} | audio=${s.audioContent?.substring(0, 60)}... | eng=${s.engagementScore}`));
 
         const avgScore = Math.round(
             finalScenes.reduce((acc, s) => acc + s.engagementScore, 0) / finalScenes.length

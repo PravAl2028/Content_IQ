@@ -172,9 +172,9 @@ export async function startVideoAnalysis(file: File) {
 
     try {
         const durationSeconds = await readVideoDuration(file)
-        const sampleCount = Math.min(20, Math.max(5, durationSeconds))
+        const sampleCount = 18; // Exactly 18 frames as requested
         const timestamps = Array.from({ length: sampleCount }, (_, i) =>
-            Math.max(0, Math.round((i / (sampleCount - 1)) * Math.max(0, durationSeconds - 0.1)))
+            Math.max(0, Number(((i / (sampleCount - 1)) * Math.max(0, durationSeconds - 0.1)).toFixed(2)))
         )
         const frames = await extractFrames(file, timestamps)
 
